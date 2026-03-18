@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boteco Bangu - Área de Jogos</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        wine: '#7b1113',
+                        gold: '#facc15',
+                        'deep-red': '#4a0404',
+                    },
+                    fontFamily: {
+                        paytone: ['Paytone One', 'sans-serif'],
+                        montserrat: ['Montserrat', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Paytone+One&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/jogos.css">
+</head>
+<body class="game-hub-bg">
+
+    <div class="container mx-auto px-4 py-12 flex flex-col items-center min-h-screen">
+        <a href="index.html" class="mb-12">
+            <img src="assets/img/Logo_logo-site.png" alt="Boteco Bangu" class="h-24">
+        </a>
+        
+        <h1 class="text-4xl md:text-6xl font-paytone text-gold mb-4 text-center uppercase tracking-tight">Canto do Tédio</h1>
+        <p class="text-xl text-white opacity-80 mb-12 text-center font-montserrat">Escolha um jogo para passar o tempo enquanto seu pedido não chega!</p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-5xl">
+            <!-- Jogo 1 -->
+            <div class="game-card" onclick="startCatchGame()">
+                <i class="fas fa-utensils"></i>
+                <h3 class="text-2xl font-paytone mb-2">Boteco Catch</h3>
+                <p class="text-sm opacity-70">Pegue os petiscos e o chopp, mas fuja da conta alta!</p>
+            </div>
+            
+            <!-- Jogo 2 -->
+            <div class="game-card" onclick="startPourGame()">
+                <i class="fas fa-beer"></i>
+                <h3 class="text-2xl font-paytone mb-2">Perfect Pour</h3>
+                <p class="text-sm opacity-70">Encha o copo perfeitamente. Cuidado para não transbordar!</p>
+            </div>
+            
+            <!-- Jogo 3 -->
+            <div class="game-card" onclick="startMemoryGame()">
+                <i class="fas fa-brain"></i>
+                <h3 class="text-2xl font-paytone mb-2">Memória Bangu</h3>
+                <p class="text-sm opacity-70">Encontre os pares dos nossos delíciosos itens.</p>
+            </div>
+        </div>
+
+        <a href="index.html" class="mt-16 text-white/50 hover:text-gold transition-colors font-bold uppercase tracking-widest text-sm">
+            <i class="fas fa-arrow-left mr-2"></i> Voltar para o Site
+        </a>
+    </div>
+
+    <!-- Game Container Overlay -->
+    <div id="game-container">
+        <span class="close-game" onclick="closeGame()">&times;</span>
+        
+        <div id="game-canvas-container">
+            <!-- Game dynamic content goes here -->
+        </div>
+
+        <div id="game-controls" class="w-full max-w-xs px-4">
+            <!-- Controls vary by game -->
+        </div>
+        
+        <div id="game-over-screen" class="absolute inset-0 bg-black/95 flex hidden flex-col items-center justify-center p-8 text-center z-50 overflow-y-auto">
+            <h2 class="text-4xl font-paytone text-gold mb-2 uppercase">Fim de Jogo!</h2>
+            <p id="final-score-text" class="text-2xl text-white mb-6">Sua pontuação: 0</p>
+            
+            <div class="w-full max-w-xs mb-6">
+                <p class="text-white/60 text-sm mb-2 uppercase tracking-widest">Seu Apelido</p>
+                <input type="text" id="nickname-input" placeholder="Ex: Zeca do Chopp" maxlength="15">
+            </div>
+
+            <div class="grid grid-cols-1 gap-3 w-full max-w-xs mb-8">
+                <button onclick="shareWhatsApp()" class="btn-social btn-whatsapp">
+                    <i class="fab fa-whatsapp text-xl"></i> Compartilhar no Zap
+                </button>
+                <button onclick="downloadStory()" class="btn-social btn-instagram">
+                    <i class="fab fa-instagram text-xl"></i> Baixar para Stories
+                </button>
+            </div>
+
+            <div class="flex flex-col gap-3 w-full max-w-xs border-t border-white/10 pt-6">
+                <button onclick="restartCurrentGame()" class="bg-gold text-red-950 font-bold px-8 py-3 rounded-full hover:scale-105 transition-transform w-full">Jogar Novamente</button>
+                <button onclick="closeGame()" class="bg-white/10 text-white font-bold px-8 py-3 rounded-full hover:bg-white/20 transition-colors w-full uppercase text-xs tracking-widest">Sair para o Início</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden Canvas for Image Generation -->
+    <canvas id="share-canvas" width="1080" height="1920" class="hidden"></canvas>
+
+    <!-- Scripts -->
+    <script src="js/jogo-catch.js"></script>
+    <script src="js/jogo-pour.js"></script>
+    <script src="js/jogo-memory.js"></script>
+    <script>
+        let currentColor = 'gold';
+        let currentScore = 0;
+        let currentGameName = "";
+
+        function closeGame() {
+            document.getElementById('game-container').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            if (activeGame && typeof activeGame.stop === 'function') activeGame.stop();
+            activeGame = null;
+            document.getElementById('game-over-screen').classList.add('hidden');
+        }
+
+        function restartCurrentGame() {
+            document.getElementById('game-over-screen').classList.add('hidden');
+            if (activeGame && typeof activeGame.start === 'function') activeGame.start();
+        }
+
+        function showGameOver(score) {
+            currentScore = score;
+            document.getElementById('final-score-text').innerText = `Sua pontuação: ${score}`;
+            document.getElementById('game-over-screen').classList.remove('hidden');
+        }
+
+        function shareWhatsApp() {
+            const name = document.getElementById('nickname-input').value || "Um cliente fiel";
+            const text = `Fiz ${currentScore} pontos no jogo do Boteco Bangu! 🍻\nDuvido você, ${name}, me superar!\nJogue aqui: ${window.location.href}`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+        }
+
+        function downloadStory() {
+            const canvas = document.getElementById('share-canvas');
+            const ctx = canvas.getContext('2d');
+            const name = document.getElementById('nickname-input').value || "Cliente Bangu";
+
+            // Draw Background (Boteco Style)
+            ctx.fillStyle = '#1a0202';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Add Wine Gradient
+            const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            grad.addColorStop(0, '#7b1113');
+            grad.addColorStop(1, '#1a0202');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Text
+            ctx.fillStyle = '#facc15';
+            ctx.textAlign = 'center';
+            ctx.font = 'bold 120px Paytone One';
+            ctx.fillText('BOTECO BANGU', canvas.width/2, 300);
+            
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '80px Montserrat';
+            ctx.fillText('CANTO DO TÉDIO', canvas.width/2, 420);
+
+            ctx.fillStyle = '#facc15';
+            ctx.font = 'bold 300px Paytone One';
+            ctx.fillText(currentScore, canvas.width/2, 1000);
+            
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '80px Montserrat';
+            ctx.fillText('PONTOS', canvas.width/2, 1120);
+
+            ctx.font = '60px Montserrat';
+            ctx.fillText(`Jogador: ${name}`, canvas.width/2, 1300);
+
+            ctx.fillStyle = '#facc15';
+            ctx.font = 'bold 50px Montserrat';
+            ctx.fillText('botecobangu.com.br', canvas.width/2, 1700);
+
+            // Download
+            const link = document.createElement('a');
+            link.download = `score-boteco-bangu-${currentScore}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+    </script>
+</body>
+</html>

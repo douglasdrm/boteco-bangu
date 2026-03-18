@@ -90,11 +90,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeLightbox = document.getElementById('close-lightbox');
 
     if (openLightbox && lightbox && lightboxImg) {
+        const orientationTip = document.getElementById('orientation-tip');
+
         openLightbox.addEventListener('click', () => {
             lightboxImg.src = mainImg.src;
             lightbox.classList.remove('hidden');
             lightbox.classList.add('flex');
             document.body.style.overflow = 'hidden'; // Prevent scroll
+            
+            // Show tip and hide after 5 seconds
+            if (orientationTip) {
+                orientationTip.style.opacity = '1';
+                orientationTip.style.display = 'flex';
+                setTimeout(() => {
+                    orientationTip.style.opacity = '0';
+                    setTimeout(() => {
+                        orientationTip.style.display = 'none';
+                    }, 500);
+                }, 5000);
+            }
         });
 
         const closeLbox = () => {

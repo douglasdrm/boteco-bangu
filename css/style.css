@@ -190,28 +190,43 @@ h1, h2, h3, .font-paytone {
     border-radius: 0.75rem;
 }
 
+nav {
+    z-index: 100 !important;
+}
+
 /* Mobile Navbar visibility fix */
 #menu-btn {
-    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-    background: rgba(0, 0, 0, 0.2);
-    width: 45px;
-    height: 45px;
-    display: flex;
+    display: none; /* Hidden by default on Desktop */
+    text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+    background: rgba(123, 17, 19, 0.85); /* Boteco Red background for visibility */
+    width: 50px;
+    height: 50px;
     align-items: center;
     justify-content: center;
-    border-radius: 8px;
+    border-radius: 50%; /* Circle shape as requested */
     backdrop-filter: blur(4px);
     transition: all 0.3s;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+}
+
+@media (max-width: 767px) {
+    #menu-btn {
+        display: flex; /* Only show on mobile */
+    }
 }
 
 nav.bg-red-900\/95 #menu-btn {
-    background: transparent;
-    backdrop-filter: none;
+    background: rgba(0,0,0,0.2);
+    border-color: rgba(255, 255, 255, 0.1);
 }
 
 #mobile-menu {
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     transform-origin: top;
+    background: rgba(30, 2, 2, 0.9) !important; /* Transparent dark red */
+    backdrop-filter: blur(15px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 #mobile-menu.hidden {
@@ -303,8 +318,21 @@ html {
     animation: bounce-right 1s infinite;
 }
 
+#lightbox img {
+    max-width: 95vw;
+    max-height: 90vh;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 0 50px rgba(0,0,0,0.8);
+}
+
 #orientation-tip {
-    display: none;
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 110;
+    transition: opacity 0.5s ease;
 }
 
 @media (max-width: 768px) {
