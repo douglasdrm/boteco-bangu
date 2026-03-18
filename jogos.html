@@ -142,7 +142,7 @@
 
         function shareWhatsApp() {
             const name = document.getElementById('nickname-input').value || "Um cliente fiel";
-            const text = `Fiz ${currentScore} pontos no jogo do Boteco Bangu! 🍻\nDuvido você, ${name}, me superar!\nJogue aqui: ${window.location.href}`;
+            const text = `Fiz ${currentScore} pontos no jogo do Boteco Bangu! 🍻\nEu, ${name}, duvido você me superar!\n\nJogue também enquanto espera seu pedido: ${window.location.href}`;
             window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
         }
 
@@ -151,47 +151,78 @@
             const ctx = canvas.getContext('2d');
             const name = document.getElementById('nickname-input').value || "Cliente Bangu";
 
-            // Draw Background (Boteco Style)
-            ctx.fillStyle = '#1a0202';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            // Add Wine Gradient
-            const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-            grad.addColorStop(0, '#7b1113');
-            grad.addColorStop(1, '#1a0202');
-            ctx.fillStyle = grad;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            // Create Image object for background
+            const bgImg = new Image();
+            bgImg.crossOrigin = "anonymous";
+            bgImg.src = 'assets/img/04.png'; // Use one of the hero images
 
-            // Text
-            ctx.fillStyle = '#facc15';
-            ctx.textAlign = 'center';
-            ctx.font = 'bold 120px Paytone One';
-            ctx.fillText('BOTECO BANGU', canvas.width/2, 300);
-            
-            ctx.fillStyle = '#ffffff';
-            ctx.font = '80px Montserrat';
-            ctx.fillText('CANTO DO TÉDIO', canvas.width/2, 420);
+            bgImg.onload = function() {
+                // Draw Background Image
+                ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
+                
+                // Add Dark Overlay
+                ctx.fillStyle = 'rgba(26, 2, 2, 0.75)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            ctx.fillStyle = '#facc15';
-            ctx.font = 'bold 300px Paytone One';
-            ctx.fillText(currentScore, canvas.width/2, 1000);
-            
-            ctx.fillStyle = '#ffffff';
-            ctx.font = '80px Montserrat';
-            ctx.fillText('PONTOS', canvas.width/2, 1120);
+                // Border
+                ctx.strokeStyle = '#facc15';
+                ctx.lineWidth = 40;
+                ctx.strokeRect(60, 60, canvas.width - 120, canvas.height - 120);
 
-            ctx.font = '60px Montserrat';
-            ctx.fillText(`Jogador: ${name}`, canvas.width/2, 1300);
+                // Header Text
+                ctx.fillStyle = '#facc15';
+                ctx.textAlign = 'center';
+                ctx.font = 'bold 100px Paytone One';
+                ctx.fillText('BOTECO BANGU', canvas.width/2, 300);
+                
+                ctx.fillStyle = '#ffffff';
+                ctx.font = '60px Montserrat';
+                ctx.fillText('O BOTECO MAIS RAIZ DO RIO', canvas.width/2, 380);
 
-            ctx.fillStyle = '#facc15';
-            ctx.font = 'bold 50px Montserrat';
-            ctx.fillText('botecobangu.com.br', canvas.width/2, 1700);
+                // Main Message
+                ctx.font = 'italic 50px Montserrat';
+                ctx.fillText('Tava no tédio esperando meu pedido e...', canvas.width/2, 600);
+                ctx.font = 'bold 70px Montserrat';
+                ctx.fillText('ACHEI ESSE JOGUINHO!', canvas.width/2, 680);
 
-            // Download
-            const link = document.createElement('a');
-            link.download = `score-boteco-bangu-${currentScore}.png`;
-            link.href = canvas.toDataURL();
-            link.click();
+                // Score
+                ctx.fillStyle = '#facc15';
+                ctx.font = 'bold 350px Paytone One';
+                ctx.fillText(currentScore, canvas.width/2, 1050);
+                
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 80px Montserrat';
+                ctx.fillText('PONTOS!', canvas.width/2, 1150);
+
+                // Challenge
+                ctx.font = 'bold 60px Montserrat';
+                ctx.fillText(`Vê se você me supera, hein?`, canvas.width/2, 1350);
+                ctx.fillStyle = '#facc15';
+                ctx.font = 'italic 50px Montserrat';
+                ctx.fillText(`Assinado: ${name}`, canvas.width/2, 1430);
+
+                // Instagram & Site
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 50px Montserrat';
+                ctx.fillText('@boteco.bangu', canvas.width/2, 1750);
+                ctx.font = '40px Montserrat';
+                ctx.fillText('www.botecobangu.com.br', canvas.width/2, 1820);
+
+                // Download
+                const link = document.createElement('a');
+                link.download = `score-boteco-bangu.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            };
+
+            // Fallback strategy if image fails to load
+            bgImg.onerror = function() {
+                // ... same as before or just a gradient
+                ctx.fillStyle = '#7b1113';
+                ctx.fillRect(0,0, canvas.width, canvas.height);
+                ctx.fillStyle = '#facc15';
+                ctx.fillText('Erro ao carregar fundo, mas tá valendo!', canvas.width/2, canvas.height/2);
+            }
         }
     </script>
 </body>
