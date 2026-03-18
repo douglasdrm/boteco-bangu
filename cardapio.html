@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cardápio – Boteco Bangu – O boteco mais raiz do Rio</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        wine: '#7b1113',
+                        gold: '#facc15',
+                        'deep-red': '#4a0404',
+                    },
+                    fontFamily: {
+                        paytone: ['Paytone One', 'sans-serif'],
+                        montserrat: ['Montserrat', 'sans-serif'],
+                        inter: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer components {
+            .cardapio-btn {
+                @apply transition-all duration-300 cursor-pointer border-2 border-red-900/10 px-6 py-2.5 rounded-full font-bold text-sm md:text-base mb-2 hover:border-wine/30 hover:bg-wine/5 bg-white text-wine flex items-center justify-center min-w-[140px] shadow-sm;
+            }
+
+            .cardapio-btn.ativo {
+                @apply bg-gradient-to-br from-wine to-deep-red text-white shadow-xl transform scale-105 border-gold ring-2 ring-gold/20;
+            }
+
+            .cardapio-frame {
+                @apply relative p-1.5 md:p-3 bg-white rounded-xl shadow-2xl;
+                background: linear-gradient(white, white) padding-box,
+                            linear-gradient(45deg, #7b1113, #facc15, #7b1113) border-box;
+                border: 4px solid transparent;
+            }
+            
+            .cardapio-section {
+                background-color: #1a0202;
+                background-image: 
+                    linear-gradient(rgba(26, 2, 2, 0.9), rgba(26, 2, 2, 0.9)),
+                    url('https://www.transparenttextures.com/patterns/dark-wood.png');
+            }
+        }
+    </style>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Montserrat:wght@400;700;900&family=Paytone+One&display=swap" rel="stylesheet">
+    
+    <!-- Icons & Animations -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="assets/img/cropped-Logo_favicon.png">
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Header / Navbar -->
+    <nav class="fixed w-full z-50 transition-all duration-300 py-4 bg-red-900 shadow-lg">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <a href="index.html" class="flex items-center">
+                <img src="assets/img/Logo_logo-site.png" alt="Boteco Bangu" class="h-12 md:h-16">
+            </a>
+            
+            <!-- Desktop Menu -->
+            <div class="hidden md:flex space-x-8 items-center font-bold text-white uppercase tracking-wider">
+                <a href="index.html#inicio" class="hover:text-gold transition-colors">Início</a>
+                <a href="cardapio.html" class="text-gold border-b-2 border-gold pb-1">Cardápio</a>
+                <a href="index.html#galeria" class="hover:text-gold transition-colors">Galeria</a>
+                <a href="index.html#contato" class="hover:text-gold transition-colors">Contato</a>
+            </div>
+            
+            <!-- Mobile Menu Button -->
+            <button id="menu-btn" class="md:hidden text-white text-3xl">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-red-900 absolute top-full left-0 w-full p-4 flex flex-col space-y-4 text-white font-bold uppercase text-center shadow-xl">
+            <a href="index.html#inicio" class="py-2 hover:bg-red-800 rounded">Início</a>
+            <a href="cardapio.html" class="py-2 bg-red-800 text-gold rounded border border-gold">Cardápio</a>
+            <a href="index.html#galeria" class="py-2 hover:bg-red-800 rounded">Galeria</a>
+            <a href="index.html#contato" class="py-2 hover:bg-red-800 rounded">Contato</a>
+        </div>
+    </nav>
+
+    <!-- Cardápio Header Section -->
+    <section class="pt-32 pb-12 bg-wine text-white text-center">
+        <div class="container mx-auto px-4" data-aos="zoom-in">
+            <h1 class="text-4xl md:text-6xl font-paytone mb-4 uppercase">Nosso Cardápio</h1>
+            <p class="text-lg md:text-xl font-montserrat">Toque em uma categoria para ver as delícias.</p>
+        </div>
+    </section>
+
+    <!-- Cardápio Interactive Section -->
+    <section class="py-12 cardapio-section min-h-[80vh]">
+        <div class="container mx-auto px-4">
+            
+            <!-- Category Buttons -->
+            <div class="flex flex-wrap justify-center gap-3 mb-12" data-aos="fade-up">
+                <button class="cardapio-btn active ativo" data-img="assets/img/1.png">
+                    Pratos para Compartilhar
+                </button>
+                <button class="cardapio-btn" data-img="assets/img/2.png">
+                    Petiscos
+                </button>
+                <button class="cardapio-btn" data-img="assets/img/3.png">
+                    Petiscos Especiais
+                </button>
+                <button class="cardapio-btn" data-img="assets/img/4.png">
+                    Sandubas e Sobremesas
+                </button>
+                <button class="cardapio-btn" data-img="assets/img/5.png">
+                    Bebidas e Drinks
+                </button>
+                <button class="cardapio-btn" data-img="assets/img/6.png">
+                    Cerveja e Chopp
+                </button>
+                <button class="cardapio-btn" data-img="assets/img/7.png">
+                    Carta de Vinhos
+                </button>
+            </div>
+
+            <!-- Image Display -->
+            <div class="max-w-5xl mx-auto mb-20" data-aos="fade-up" data-aos-delay="200">
+                <div class="cardapio-frame">
+                    <img id="cardapio-imagem" src="assets/img/1.png" alt="Cardápio" class="w-full h-auto transition-opacity duration-300" loading="lazy">
+                </div>
+            </div>
+
+            <div class="text-center mt-12" data-aos="fade-up">
+                <div class="inline-block bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-white/10">
+                    <h3 class="text-2xl font-paytone text-gold mb-4">AVISO IMPORTANTE</h3>
+                    <p class="text-gray-300 max-w-2xl mx-auto italic">
+                        * Preços e disponibilidade sujeitos a alteração sem aviso prévio. Consulte o garçom para saber sobre promoções do dia.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-red-900 text-white py-12">
+        <div class="container mx-auto px-4 text-center">
+            <img src="assets/img/Logo_logo-site.png" alt="Logo" class="h-20 mx-auto mb-6" loading="lazy">
+            <p class="text-xl font-montserrat italic mb-8">"O boteco mais raiz do Rio!"</p>
+            <div class="flex justify-center space-x-6 mb-8 text-2xl">
+                <a href="#"><i class="fab fa-facebook hover:text-gold transition-colors"></i></a>
+                <a href="https://instagram.com/boteco.bangu"><i class="fab fa-instagram hover:text-gold transition-colors"></i></a>
+                <a href="https://wa.me/5521966041648"><i class="fab fa-whatsapp hover:text-gold transition-colors"></i></a>
+            </div>
+            <div class="border-t border-red-800 pt-8 text-sm opacity-60">
+                <p>&copy; 2026 Boteco Bangu. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- WhatsApp Floating Button -->
+    <a href="https://wa.me/5521966041648" class="whatsapp-btn shadow-2xl" target="_blank">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

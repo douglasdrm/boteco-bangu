@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boteco Bangu – O boteco mais raiz do Rio no Bangu Shopping</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        wine: '#7b1113',
+                        gold: '#facc15',
+                        'deep-red': '#4a0404',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer components {
+            .btn-primary {
+                @apply bg-gradient-to-r from-yellow-400 to-yellow-500 text-red-900 font-bold py-3 px-10 rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-xl active:scale-95 border-b-4 border-yellow-600;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .btn-outline {
+                @apply border-2 border-white text-white hover:bg-white/10 font-bold py-3 px-10 rounded-full transition-all duration-300 transform hover:scale-105 active:scale-95 backdrop-blur-sm;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+    </style>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Montserrat:wght@400;700;900&family=Paytone+One&display=swap" rel="stylesheet">
+    
+    <!-- Icons & Animations -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="assets/img/cropped-Logo_favicon.png">
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Header / Navbar -->
+    <nav class="fixed w-full z-50 transition-all duration-300 py-4 bg-transparent">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <a href="index.html" class="flex items-center">
+                <img src="assets/img/Logo_logo-site.png" alt="Boteco Bangu" class="h-12 md:h-16">
+            </a>
+            
+            <!-- Desktop Menu -->
+            <div class="hidden md:flex space-x-8 items-center font-bold text-white uppercase tracking-wider">
+                <a href="#inicio" class="hover:text-gold transition-colors">Início</a>
+                <a href="cardapio.html" class="hover:text-gold transition-colors">Cardápio</a>
+                <a href="#galeria" class="hover:text-gold transition-colors">Galeria</a>
+                <a href="#contato" class="hover:text-gold transition-colors">Contato</a>
+            </div>
+            
+            <!-- Mobile Menu Button -->
+            <button id="menu-btn" class="md:hidden text-white text-3xl">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-red-900 absolute top-full left-0 w-full p-4 flex flex-col space-y-4 text-white font-bold uppercase text-center shadow-xl">
+            <a href="#inicio" class="py-2 hover:bg-red-800 rounded">Início</a>
+            <a href="cardapio.html" class="py-2 hover:bg-red-800 rounded">Cardápio</a>
+            <a href="#galeria" class="py-2 hover:bg-red-800 rounded">Galeria</a>
+            <a href="#contato" class="py-2 hover:bg-red-800 rounded">Contato</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="inicio" class="relative h-screen flex items-center justify-center text-center text-white pt-20">
+        <!-- Background Carousel -->
+        <div class="hero-carousel-container">
+            <div class="hero-slide active" style="background-image: url('assets/img/04.png');"></div>
+            <div class="hero-slide" style="background-image: url('assets/img/03.png');"></div>
+            <div class="hero-slide" style="background-image: url('assets/img/02.png');"></div>
+            <div class="hero-slide" style="background-image: url('assets/img/01.png');"></div>
+            <div class="hero-overlay"></div>
+        </div>
+        
+        <div class="relative z-20 px-4 max-w-4xl" data-aos="fade-up">
+            <h1 class="text-3xl md:text-7xl font-paytone mb-6 leading-tight uppercase">
+                O BOTECO MAIS <span class="text-gold">RAIZ</span> DO RIO CHEGOU!
+            </h1>
+            <p class="text-lg md:text-2xl mb-10 font-montserrat">
+                Chopp gelado, petiscos incríveis e o melhor clima de boteco carioca no coração do Bangu Shopping.
+            </p>
+            <div class="flex flex-col md:flex-row gap-4 justify-center">
+                <a href="https://wa.me/5521966041648" class="btn-primary">Fale Conosco</a>
+                <a href="#galeria" class="btn-outline">Ver Fotos</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sobre Section -->
+    <section class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div data-aos="fade-right">
+                    <img src="assets/img/03.png" alt="O Sabor Carioca" class="rounded-2xl shadow-2xl" loading="lazy">
+                </div>
+                <div data-aos="fade-left">
+                    <h2 class="text-3xl md:text-5xl font-paytone text-red-700 mb-6 uppercase">O Verdadeiro Sabor Carioca</h2>
+                    <p class="text-lg text-gray-700 mb-6 leading-relaxed">
+                        No Boteco Bangu, a gente mantém viva a tradição dos botecos de bairro com um toque moderno e muito sabor. 
+                    </p>
+                    <p class="text-lg text-gray-700 mb-8 leading-relaxed">
+                        Nosso chopp é dos mais gelados, os petiscos são feitos na hora e o atendimento tem aquele jeitinho carioca que só a gente sabe fazer.
+                    </p>
+                    <div class="flex items-center text-red-700 font-bold mb-8">
+                        <i class="far fa-clock text-2xl mr-3"></i>
+                        <span>Todos os dias, das 11h às 22h</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cardápio Teaser -->
+    <section class="py-20 bg-red-50 text-center">
+        <div class="container mx-auto px-4" data-aos="zoom-in">
+            <h2 class="text-3xl md:text-5xl font-paytone text-red-700 mb-8 uppercase">Um Pouco do Nosso Cardápio</h2>
+            <div class="max-w-4xl mx-auto mb-12">
+                <p class="text-xl text-gray-600">De clássicos como bolinho de feijoada a combos exclusivos para reunir a galera.</p>
+            </div>
+            <a href="cardapio.html" class="btn-primary">Ver Cardápio Completo</a>
+        </div>
+    </section>
+
+    <!-- Galeria Section -->
+    <section id="galeria" class="py-20 bg-white overflow-hidden">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl md:text-5xl font-paytone text-red-700 mb-12 text-center uppercase">Nosso Dia a Dia</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="gallery-item overflow-hidden rounded-lg shadow-lg" data-aos="flip-left">
+                    <img src="assets/img/01.png" alt="Galeria 1" class="w-full h-64 object-cover" loading="lazy">
+                </div>
+                <div class="gallery-item overflow-hidden rounded-lg shadow-lg" data-aos="flip-left" data-aos-delay="100">
+                    <img src="assets/img/02.png" alt="Galeria 2" class="w-full h-64 object-cover" loading="lazy">
+                </div>
+                <div class="gallery-item overflow-hidden rounded-lg shadow-lg" data-aos="flip-left" data-aos-delay="200">
+                    <img src="assets/img/03.png" alt="Galeria 3" class="w-full h-64 object-cover" loading="lazy">
+                </div>
+                <div class="gallery-item overflow-hidden rounded-lg shadow-lg" data-aos="flip-left" data-aos-delay="300">
+                    <img src="assets/img/04.png" alt="Galeria 4" class="w-full h-64 object-cover" loading="lazy">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contato / Map Section -->
+    <section id="contato" class="py-20 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <div class="rounded-2xl overflow-hidden shadow-2xl h-[400px]" data-aos="fade-up">
+                    <!-- Google Maps Iframe -->
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3676.574635811776!2d-43.468894123847285!3d-22.871901337375276!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9be0ff2fdfc555%3A0x867332c0d8d75e47!2sBangu%20Shopping!5e0!3m2!1spt-BR!2sbr!4v1710769000000!5m2!1spt-BR!2sbr" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+                <div data-aos="fade-left">
+                    <h2 class="text-3xl md:text-4xl font-paytone text-red-700 mb-8 uppercase">Onde Estamos</h2>
+                    <div class="space-y-6">
+                        <div class="flex items-start">
+                            <i class="fas fa-map-marker-alt text-2xl text-red-700 mt-1 mr-4"></i>
+                            <div>
+                                <h3 class="font-bold text-xl mb-1">Bangu Shopping - 1º Piso</h3>
+                                <p class="text-gray-600">R. Fonseca, 240 - Loja 130 - Bangu, Rio de Janeiro - RJ, 21820-005</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fab fa-whatsapp text-2xl text-green-500 mr-4"></i>
+                            <a href="https://wa.me/5521966041648" class="text-lg font-bold hover:text-red-700 transition-colors">+55 21 96604-1648</a>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="far fa-envelope text-2xl text-red-700 mr-4"></i>
+                            <a href="mailto:contato@botecobangu.com.br" class="text-lg hover:text-red-700 transition-colors">contato@botecobangu.com.br</a>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fab fa-instagram text-2xl text-pink-600 mr-4"></i>
+                            <a href="https://instagram.com/boteco.bangu" target="_blank" class="text-lg hover:text-red-700 transition-colors">@boteco.bangu</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-red-900 text-white py-12">
+        <div class="container mx-auto px-4 text-center">
+            <img src="assets/img/Logo_logo-site.png" alt="Logo" class="h-20 mx-auto mb-6" loading="lazy">
+            <p class="text-xl font-montserrat italic mb-8">"O boteco mais raiz do Rio!"</p>
+            <div class="flex justify-center space-x-6 mb-8 text-2xl">
+                <a href="#"><i class="fab fa-facebook hover:text-gold transition-colors"></i></a>
+                <a href="https://instagram.com/boteco.bangu"><i class="fab fa-instagram hover:text-gold transition-colors"></i></a>
+                <a href="https://wa.me/5521966041648"><i class="fab fa-whatsapp hover:text-gold transition-colors"></i></a>
+            </div>
+            <div class="border-t border-red-800 pt-8 text-sm opacity-60">
+                <p>&copy; 2026 Boteco Bangu. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- WhatsApp Floating Button -->
+    <a href="https://wa.me/5521966041648" class="whatsapp-btn shadow-2xl" target="_blank">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

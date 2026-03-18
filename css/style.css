@@ -1,0 +1,154 @@
+/* Boteco Bangu - Custom Styles */
+
+:root {
+    --color-wine: #b91c1c;
+    --color-gold: #facc15;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, .font-paytone {
+    font-family: 'Paytone One', sans-serif;
+    letter-spacing: -0.02em;
+}
+
+.font-montserrat {
+    font-family: 'Montserrat', sans-serif;
+}
+
+/* Responsive Typography */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 2.25rem !important;
+        line-height: 1.1 !important;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    }
+    h2 {
+        font-size: 1.875rem !important;
+    }
+    .text-lg {
+        font-size: 1rem !important;
+    }
+}
+
+/* Hero Title Shadow (Desktop too) */
+#inicio h1 {
+    text-shadow: 3px 3px 6px rgba(0,0,0,0.6);
+}
+
+/* Custom button styles movidos para HTML para processamento CDN */
+
+/* Hero Carousel Styles */
+.hero-carousel-container {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.hero-slide {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out;
+    transform: scale(1.1); /* Slight zoom for Ken Burns effect start */
+}
+
+.hero-slide.active {
+    opacity: 1;
+    transform: scale(1); /* Smooth zoom out */
+}
+
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.7));
+    z-index: 10;
+}
+
+/* Cardápio Specifics - Estilos movidos para o HTML para processamento correto do CDN */
+.cardapio-section {
+    /* Base background if JS/Tailwind fails */
+    background-color: #1a0202;
+}
+
+/* Mobile Navbar specific */
+#mobile-menu {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: top;
+}
+
+#mobile-menu.hidden {
+    display: none;
+    opacity: 0;
+    transform: scaleY(0);
+}
+
+#mobile-menu:not(.hidden) {
+    display: flex;
+    opacity: 1;
+    transform: scaleY(1);
+}
+
+#mobile-menu a {
+    @apply transition-all duration-200 active:bg-red-700;
+}
+
+/* WhatsApp Floating Button */
+.whatsapp-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #25d366;
+    color: white;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+    z-index: 1000;
+    transition: transform 0.3s ease;
+}
+
+.whatsapp-btn:hover {
+    transform: scale(1.1);
+}
+
+@media (max-width: 768px) {
+    .whatsapp-btn {
+        width: 50px;
+        height: 50px;
+        font-size: 24px;
+        bottom: 15px;
+        right: 15px;
+    }
+}
+
+/* Premium Section Spacing */
+section {
+    @apply py-16 md:py-24;
+}
+
+/* Gallery Hover */
+.gallery-item img {
+    transition: transform 0.5s ease;
+}
+
+.gallery-item:hover img {
+    transform: scale(1.1);
+}
+
+/* Scroll Smoothing */
+html {
+    scroll-behavior: smooth;
+}
