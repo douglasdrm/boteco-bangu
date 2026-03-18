@@ -326,10 +326,34 @@ html {
 
 #lightbox img {
     max-width: 95vw;
-    max-height: 90vh;
+    height: auto;
     object-fit: contain;
     border-radius: 8px;
     box-shadow: 0 0 50px rgba(0,0,0,0.8);
+    transition: transform 0.3s ease;
+}
+
+.lightbox-content {
+    max-height: 85vh;
+    display: flex;
+    justify-content: center;
+}
+
+/* Landscape Mode Adjustments */
+@media (max-height: 500px) and (orientation: landscape) {
+    .lightbox-content {
+        max-height: 100vh;
+        width: 100%;
+        align-items: flex-start; /* Permite rolar do topo */
+    }
+    #lightbox img {
+        max-width: 100%;
+        width: 100vw;
+        height: auto;
+    }
+    #orientation-tip {
+        display: none !important; /* Esconde a dica se já estiver em landscape */
+    }
 }
 
 #orientation-tip {
