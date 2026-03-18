@@ -60,22 +60,59 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 // Fade out & slight scale
                 mainImg.style.transition = 'all 0.4s ease-in-out';
-                mainImg.style.opacity = '0';
+                mainImg.style.opacity = '0.3';
                 mainImg.style.transform = 'scale(0.98)';
                 
                 setTimeout(() => {
                     mainImg.src = newImg;
-                    // Fade in & back to normal once loaded
                     mainImg.onload = () => {
                         mainImg.style.opacity = '1';
                         mainImg.style.transform = 'scale(1)';
                     };
-                }, 400);
+                }, 300);
 
                 // Update active state
                 cardapioButtons.forEach(btn => btn.classList.remove('ativo'));
                 this.classList.add('ativo');
+
+                // Smooth scroll to image on mobile
+                if (window.innerWidth < 768) {
+                    mainImg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
             });
+        });
+    }
+
+    // Lightbox Logic
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const openLightbox = document.getElementById('open-lightbox');
+    const closeLightbox = document.getElementById('close-lightbox');
+
+    if (openLightbox && lightbox && lightboxImg) {
+        openLightbox.addEventListener('click', () => {
+            lightboxImg.src = mainImg.src;
+            lightbox.classList.remove('hidden');
+            lightbox.classList.add('flex');
+            document.body.style.overflow = 'hidden'; // Prevent scroll
+        });
+
+        const closeLbox = () => {
+            lightbox.classList.add('hidden');
+            lightbox.classList.remove('flex');
+            document.body.style.overflow = 'auto';
+        };
+
+        if (closeLightbox) closeLightbox.addEventListener('click', closeLbox);
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox || e.target.id === 'lightbox') closeLbox();
+        });
+
+        // Close on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !lightbox.classList.contains('hidden')) {
+                closeLbox();
+            }
         });
     }
 

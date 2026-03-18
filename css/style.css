@@ -138,33 +138,31 @@ h1, h2, h3, .font-paytone {
 }
 
 .cardapio-btn {
-    transition: all 0.3s;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
-    border: 2px solid rgba(123, 17, 19, 0.1);
-    padding: 0.625rem 1.5rem;
-    border-radius: 9999px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    padding: 1.25rem 1.75rem;
+    border-radius: 1rem;
     font-weight: 700;
-    background-color: white;
-    color: #7b1113;
+    background-color: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(8px);
+    color: white;
     display: flex;
     align-items: center;
-    justify-content: center;
-    min-width: 140px;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .cardapio-btn:hover {
-    border-color: rgba(123, 17, 19, 0.3);
-    background-color: rgba(123, 17, 19, 0.05);
+    border-color: var(--color-gold);
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: translateX(5px);
 }
 
 .cardapio-btn.ativo {
-    background: linear-gradient(to bottom right, #7b1113, #4a0404);
-    color: white;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    transform: scale(1.05);
-    border-color: #facc15;
-    outline: 2px solid rgba(250, 204, 21, 0.2);
+    background: linear-gradient(to right, #7b1113, #4a0404);
+    color: var(--color-gold);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+    border-color: var(--color-gold);
 }
 
 .cardapio-frame {
@@ -192,7 +190,25 @@ h1, h2, h3, .font-paytone {
     border-radius: 0.75rem;
 }
 
-/* Mobile Navbar specific */
+/* Mobile Navbar visibility fix */
+#menu-btn {
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    background: rgba(0, 0, 0, 0.2);
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    backdrop-filter: blur(4px);
+    transition: all 0.3s;
+}
+
+nav.bg-red-900\/95 #menu-btn {
+    background: transparent;
+    backdrop-filter: none;
+}
+
 #mobile-menu {
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     transform-origin: top;
@@ -275,4 +291,24 @@ section {
 /* Scroll Smoothing */
 html {
     scroll-behavior: smooth;
+}
+
+/* Animations */
+@keyframes bounce-right {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(5px); }
+}
+
+.ativo i.fa-chevron-right {
+    animation: bounce-right 1s infinite;
+}
+
+#orientation-tip {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    #orientation-tip {
+        display: flex;
+    }
 }

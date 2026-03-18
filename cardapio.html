@@ -85,35 +85,66 @@
         <div class="container mx-auto px-4">
             
             <!-- Category Buttons -->
-            <div class="flex flex-wrap justify-center gap-3 mb-12" data-aos="fade-up">
-                <button class="cardapio-btn active ativo" data-img="assets/img/1.png">
-                    Pratos para Compartilhar
+            <div class="flex flex-col max-w-2xl mx-auto gap-4 mb-12" data-aos="fade-up">
+                <button class="cardapio-btn active ativo w-full justify-between" data-img="assets/img/1.png">
+                    <span><i class="fas fa-utensils mr-3 text-xl"></i> Pratos para Compartilhar</span>
+                    <i class="fas fa-chevron-right opacity-30"></i>
                 </button>
-                <button class="cardapio-btn" data-img="assets/img/2.png">
-                    Petiscos
+                <button class="cardapio-btn w-full justify-between" data-img="assets/img/2.png">
+                    <span><i class="fas fa-drumstick-bite mr-3 text-xl"></i> Petiscos</span>
+                    <i class="fas fa-chevron-right opacity-30"></i>
                 </button>
-                <button class="cardapio-btn" data-img="assets/img/3.png">
-                    Petiscos Especiais
+                <button class="cardapio-btn w-full justify-between" data-img="assets/img/3.png">
+                    <span><i class="fas fa-star mr-3 text-xl"></i> Petiscos Especiais</span>
+                    <i class="fas fa-chevron-right opacity-30"></i>
                 </button>
-                <button class="cardapio-btn" data-img="assets/img/4.png">
-                    Sandubas e Sobremesas
+                <button class="cardapio-btn w-full justify-between" data-img="assets/img/4.png">
+                    <span><i class="fas fa-hamburger mr-3 text-xl"></i> Sandubas e Sobremesas</span>
+                    <i class="fas fa-chevron-right opacity-30"></i>
                 </button>
-                <button class="cardapio-btn" data-img="assets/img/5.png">
-                    Bebidas e Drinks
+                <button class="cardapio-btn w-full justify-between" data-img="assets/img/5.png">
+                    <span><i class="fas fa-cocktail mr-3 text-xl"></i> Bebidas e Drinks</span>
+                    <i class="fas fa-chevron-right opacity-30"></i>
                 </button>
-                <button class="cardapio-btn" data-img="assets/img/6.png">
-                    Cerveja e Chopp
+                <button class="cardapio-btn w-full justify-between" data-img="assets/img/6.png">
+                    <span><i class="fas fa-beer mr-3 text-xl"></i> Cerveja e Chopp</span>
+                    <i class="fas fa-chevron-right opacity-30"></i>
                 </button>
-                <button class="cardapio-btn" data-img="assets/img/7.png">
-                    Carta de Vinhos
+                <button class="cardapio-btn w-full justify-between" data-img="assets/img/7.png">
+                    <span><i class="fas fa-wine-glass mr-3 text-xl"></i> Carta de Vinhos</span>
+                    <i class="fas fa-chevron-right opacity-30"></i>
                 </button>
             </div>
 
             <!-- Image Display -->
             <div class="max-w-5xl mx-auto mb-20" data-aos="fade-up" data-aos-delay="200">
-                <div class="cardapio-frame">
-                    <img id="cardapio-imagem" src="assets/img/1.png" alt="Cardápio" class="w-full h-auto transition-opacity duration-300" loading="lazy">
+                <div class="cardapio-frame cursor-zoom-in group relative" id="open-lightbox">
+                    <img id="cardapio-imagem" src="assets/img/1.png" alt="Cardápio" class="w-full h-auto transition-all duration-300 group-hover:brightness-90" loading="lazy">
+                    <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20">
+                        <span class="bg-white/90 text-red-900 px-4 py-2 rounded-full font-bold shadow-lg">
+                            <i class="fas fa-search-plus mr-2"></i> Clique para ampliar
+                        </span>
+                    </div>
                 </div>
+            </div>
+
+            <!-- Lightbox Modal -->
+            <div id="lightbox" class="fixed inset-0 z-[100] bg-black/95 hidden flex-col items-center justify-center p-4">
+                <button id="close-lightbox" class="absolute top-6 right-6 text-white text-4xl hover:text-gold transition-colors">
+                    <i class="fas fa-times"></i>
+                </button>
+                
+                <!-- Orientation Tip -->
+                <div id="orientation-tip" class="mb-4 bg-gold text-red-950 px-6 py-3 rounded-full font-bold shadow-xl animate-bounce flex items-center">
+                    <i class="fas fa-mobile-alt mr-3 text-2xl rotate-90"></i>
+                    Vire o celular para ver melhor!
+                </div>
+
+                <div class="max-w-full max-h-[85vh] overflow-auto">
+                    <img id="lightbox-img" src="" alt="Cardápio Ampliado" class="max-w-full h-auto shadow-2xl rounded-lg">
+                </div>
+                
+                <p class="text-white/60 mt-4 text-sm font-montserrat">Toque fora ou no X para fechar</p>
             </div>
 
             <div class="text-center mt-12" data-aos="fade-up">
