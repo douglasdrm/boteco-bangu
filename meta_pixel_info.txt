@@ -1,0 +1,7 @@
+Meta Pixel ID: 915299581355320
+
+Conversion API Token:
+EAA8r2EUevsUBQ6yb4hqtlADbsWVZAId3dtGiaFQ5y8ZAd8BZB2u83qYK1FBCP6Gdzx2xYwCrr3heYa8X3MgNAHMNGXg4w9gHSx6ZBjWzxY7EE9CdM5xgBO0wHnl7N13Y7vgKGaXyVd4UhFWnbHvZBQNFicjJr5ZCbXvKt5bMJUlwYax3PzIwEhUA3v316eZByv6WAZDZD
+
+Observação: O Token da API de Conversões é para uso em servidor (backend). 
+Como este site é estático (HTML/CSS/JS), o Pixel via navegador (instalado nos arquivos HTML) é o método principal de rastreamento.
