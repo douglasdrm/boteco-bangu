@@ -1,0 +1,14 @@
+RewriteEngine On
+
+# 1. Redirecionar index.html para a raiz /
+RewriteCond %{THE_REQUEST} /index\.html [NC]
+RewriteRule ^(.*)index\.html$ /$1 [L,R=301]
+
+# 2. Redirecionar requisições diretas de .html para a versão limpa (SEO)
+RewriteCond %{THE_REQUEST} \s/+(.+)\.html[\s?] [NC]
+RewriteRule ^ /%1 [L,R=301]
+
+# 3. Resolver URLs sem extensão para o arquivo .html correspondente internamente
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.html -f
+RewriteRule ^([^\.]+)$ $1.html [NC,L]

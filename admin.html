@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Admin – Boteco Bangu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Paytone+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        body { font-family: 'Montserrat', sans-serif; }
+        .font-paytone { font-family: 'Paytone One', sans-serif; }
+        #upload-status { display: none; position: fixed; bottom: 20px; right: 20px; z-index: 1000; }
+    </style>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-V54PKFDRCZ"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-V54PKFDRCZ');
+    </script>
+</head>
+
+<body class="bg-gray-100 text-gray-900">
+
+    <div id="upload-status" class="bg-blue-600 text-white px-6 py-3 rounded-xl shadow-2xl flex items-center gap-3 animate-bounce">
+        <i class="fas fa-spinner fa-spin"></i>
+        <span class="font-bold text-sm">SUBINDO IMAGEM...</span>
+    </div>
+
+    <!-- Login Screen -->
+    <div id="login-screen" class="min-h-screen flex items-center justify-center p-4">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md border-t-8 border-red-800">
+            <div class="text-center mb-8">
+                <img src="assets/img/Logo_logo-site.png" alt="Logo" class="h-20 mx-auto mb-4 grayscale brightness-0">
+                <h1 class="text-2xl font-paytone text-red-800 uppercase">Acesso Restrito</h1>
+            </div>
+            <form id="login-form" class="space-y-4">
+                <input type="email" id="email" placeholder="E-mail" required class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                <input type="password" id="password" placeholder="Senha" required class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                <button type="submit" class="w-full bg-red-800 text-white font-bold py-3 rounded-lg hover:bg-red-900 transition-colors">ENTRAR</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="admin-dashboard" class="hidden min-h-screen flex flex-col">
+        <header class="bg-red-900 text-white p-4 shadow-lg sticky top-0 z-30">
+            <div class="container mx-auto flex justify-between items-center">
+                <h2 class="font-paytone uppercase">Admin Cardápio</h2>
+                <button onclick="handleLogout()" class="text-sm font-bold"><i class="fas fa-sign-out-alt"></i> SAIR</button>
+            </div>
+        </header>
+
+        <main class="flex-1 container mx-auto p-4 md:p-8">
+            <div class="flex justify-between items-center mb-8">
+                <h1 class="text-2xl font-paytone text-gray-800 uppercase tracking-tighter">Seus Pratos</h1>
+                <button onclick="openModal()" class="bg-green-600 text-white font-bold px-6 py-3 rounded-xl hover:bg-green-700 shadow-lg">+ NOVO PRATO</button>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="p-4 border-b border-gray-100">
+                    <input type="text" id="search-input" oninput="renderTable()" placeholder="Buscar por nome ou categoria..." class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none">
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead class="bg-gray-50 border-b border-gray-100">
+                            <tr>
+                                <th class="p-4 text-xs font-bold uppercase text-gray-400">Prato</th>
+                                <th class="p-4 text-xs font-bold uppercase text-gray-400">Categoria</th>
+                                <th class="p-4 text-xs font-bold uppercase text-gray-400">Preço</th>
+                                <th class="p-4 text-xs font-bold uppercase text-gray-400 text-right">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="items-list" class="divide-y divide-gray-100"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal -->
+    <div id="item-modal" class="fixed inset-0 z-[100] bg-black/60 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-y-auto max-h-[90vh]">
+            <div class="bg-red-800 p-6 text-white flex justify-between items-center sticky top-0 z-10">
+                <h2 id="modal-title" class="text-xl font-paytone uppercase">Editar Prato</h2>
+                <button onclick="closeModal()" class="text-white/70"><i class="fas fa-times text-2xl"></i></button>
+            </div>
+            <form id="item-form" class="p-6 space-y-4">
+                <input type="hidden" id="item-id">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold uppercase mb-1">Nome</label>
+                        <input type="text" id="item-name" required class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase mb-1">Preço</label>
+                        <input type="text" id="item-price" required class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg font-bold text-red-800">
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="block text-xs font-bold uppercase">Categoria</label>
+                            <button type="button" onclick="addCategory()" class="text-[10px] font-bold text-blue-600">+ NOVA</button>
+                        </div>
+                        <select id="item-category" required class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg"></select>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold uppercase mb-1">Descrição</label>
+                        <textarea id="item-description" rows="2" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm"></textarea>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold uppercase mb-1">Imagem</label>
+                        <input type="file" id="item-file" accept="image/*" class="w-full text-sm bg-gray-50 p-2 border border-gray-200 rounded-lg">
+                        <input type="url" id="item-image" placeholder="URL da imagem (opcional)" class="w-full p-2 mt-2 bg-gray-50 border border-gray-200 rounded-lg text-xs">
+                    </div>
+                    <div class="md:col-span-2 border-t border-gray-100 pt-4">
+                        <div class="flex justify-between items-center mb-3">
+                            <p class="text-xs font-bold uppercase text-red-800">Disponibilidade</p>
+                            <button type="button" onclick="selectAllDays()" class="text-[9px] font-bold bg-gray-200 px-2 py-1 rounded">TODOS</button>
+                        </div>
+                        <div class="grid grid-cols-4 md:grid-cols-7 gap-2 mb-4">
+                            <label class="flex flex-col items-center gap-1 text-[9px] bg-gray-50 p-2 rounded border border-gray-100"><input type="checkbox" name="days" value="1"> Seg</label>
+                            <label class="flex flex-col items-center gap-1 text-[9px] bg-gray-50 p-2 rounded border border-gray-100"><input type="checkbox" name="days" value="2"> Ter</label>
+                            <label class="flex flex-col items-center gap-1 text-[9px] bg-gray-50 p-2 rounded border border-gray-100"><input type="checkbox" name="days" value="3"> Qua</label>
+                            <label class="flex flex-col items-center gap-1 text-[9px] bg-gray-50 p-2 rounded border border-gray-100"><input type="checkbox" name="days" value="4"> Qui</label>
+                            <label class="flex flex-col items-center gap-1 text-[9px] bg-gray-50 p-2 rounded border border-gray-100"><input type="checkbox" name="days" value="5"> Sex</label>
+                            <label class="flex flex-col items-center gap-1 text-[9px] bg-gray-50 p-2 rounded border border-gray-100"><input type="checkbox" name="days" value="6"> Sab</label>
+                            <label class="flex flex-col items-center gap-1 text-[9px] bg-gray-50 p-2 rounded border border-gray-100"><input type="checkbox" name="days" value="0"> Dom</label>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <input type="time" id="item-start" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-sm">
+                            <input type="time" id="item-end" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-sm">
+                        </div>
+                    </div>
+                </div>
+                <div class="pt-4 flex gap-3">
+                    <button type="button" onclick="closeModal()" class="flex-1 py-3 font-bold text-gray-500 bg-gray-100 rounded-lg">CANCELAR</button>
+                    <button type="submit" class="flex-2 grow bg-red-800 text-white font-bold py-3 px-8 rounded-lg">SALVAR PRATO</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = "https://dhgfmfcupkysntxphepn.supabase.co"; 
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRoZ2ZtZmN1cGt5c250eHBoZXBuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NzUyMTYsImV4cCI6MjA5MjU1MTIxNn0.ahIgwSOq16X4dQBUDvSmiKUVgLl8E835EGRP4Wnxwyg";
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let menuItems = [];
+        let categories = ["Petiscos", "Pratos para Compartilhar", "Bebidas sem Álcool", "Nossos Drinks", "Nossos Sandubas", "Porções", "Especiais do Boteco", "Cervejas", "Chopps", "Carta de Vinhos", "Pratos Executivos"];
+
+        // Moeda
+        document.getElementById('item-price').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, "");
+            value = (value / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            e.target.value = value;
+        });
+
+        function renderCategorySelect() {
+            const select = document.getElementById('item-category');
+            select.innerHTML = categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+        }
+
+        function addCategory() {
+            const newCat = prompt("Nova categoria:");
+            if (newCat && !categories.includes(newCat)) { categories.push(newCat); renderCategorySelect(); document.getElementById('item-category').value = newCat; }
+        }
+
+        function selectAllDays() { document.querySelectorAll('input[name="days"]').forEach(cb => cb.checked = true); }
+
+        async function checkSession() {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (session) showDashboard(); else showLogin();
+        }
+
+        function showDashboard() {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('admin-dashboard').classList.remove('hidden');
+            loadItems();
+        }
+
+        function showLogin() {
+            document.getElementById('login-screen').classList.remove('hidden');
+            document.getElementById('admin-dashboard').classList.add('hidden');
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            if (error) alert(error.message); else showDashboard();
+        }
+
+        async function handleLogout() { await supabaseClient.auth.signOut(); window.location.reload(); }
+
+        async function loadItems() {
+            const { data, error } = await supabaseClient.from('menu_items').select('*').order('categoria');
+            if (!error) {
+                menuItems = data;
+                const dbCats = [...new Set(menuItems.map(i => i.categoria))];
+                dbCats.forEach(c => { if(!categories.includes(c)) categories.push(c); });
+                renderCategorySelect();
+                renderTable();
+            }
+        }
+
+        function renderTable() {
+            const list = document.getElementById('items-list');
+            const search = document.getElementById('search-input').value.toLowerCase();
+            const filtered = menuItems.filter(i => i.nome.toLowerCase().includes(search) || i.categoria.toLowerCase().includes(search));
+            list.innerHTML = filtered.map(item => `
+                <tr class="hover:bg-gray-50 border-b border-gray-100">
+                    <td class="p-4"><p class="font-bold text-sm">${item.nome}</p></td>
+                    <td class="p-4"><span class="bg-gray-100 px-2 py-1 rounded-full text-[9px] font-bold">${item.categoria}</span></td>
+                    <td class="p-4 font-bold text-red-800 text-sm">R$ ${item.preco.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+                    <td class="p-4 text-right flex justify-end gap-2">
+                        <button onclick="editItem(${item.id})" class="w-8 h-8 rounded bg-blue-50 text-blue-600"><i class="fas fa-edit text-xs"></i></button>
+                        <button onclick="deleteItem(${item.id})" class="w-8 h-8 rounded bg-red-50 text-red-600"><i class="fas fa-trash text-xs"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openModal(editId = null) {
+            document.getElementById('item-modal').classList.remove('hidden');
+            document.getElementById('item-form').reset();
+            document.getElementById('item-id').value = "";
+            renderCategorySelect();
+            if (editId) {
+                const item = menuItems.find(i => i.id === editId);
+                if (item) {
+                    document.getElementById('item-id').value = item.id;
+                    document.getElementById('item-name').value = item.nome;
+                    document.getElementById('item-price').value = item.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                    document.getElementById('item-category').value = item.categoria;
+                    document.getElementById('item-description').value = item.descricao;
+                    document.getElementById('item-image').value = item.imagem_url || "";
+                    document.getElementById('item-start').value = item.hora_inicio || "";
+                    document.getElementById('item-end').value = item.hora_fim || "";
+                    document.querySelectorAll('input[name="days"]').forEach(cb => cb.checked = item.dias_semana ? item.dias_semana.includes(parseInt(cb.value)) : false);
+                    document.getElementById('modal-title').innerText = "Editar Prato";
+                }
+            }
+        }
+
+        function closeModal() { document.getElementById('item-modal').classList.add('hidden'); }
+        function editItem(id) { openModal(id); }
+        async function deleteItem(id) { if(confirm("Excluir?")) { await supabaseClient.from('menu_items').delete().eq('id', id); loadItems(); } }
+
+        async function handleSave(e) {
+            e.preventDefault();
+            const id = document.getElementById('item-id').value;
+            const statusDiv = document.getElementById('upload-status');
+            const fileInput = document.getElementById('item-file');
+            
+            const days = Array.from(document.querySelectorAll('input[name="days"]:checked')).map(cb => parseInt(cb.value));
+            const price = parseFloat(document.getElementById('item-price').value.replace(/\D/g, "")) / 100;
+            let imageUrl = document.getElementById('item-image').value;
+
+            if (fileInput.files.length > 0) {
+                statusDiv.style.display = 'flex';
+                const file = fileInput.files[0];
+                const fileExt = file.name.split('.').pop();
+                const cleanName = file.name.split('.')[0].toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, '-');
+                const fileName = `${Date.now()}-${cleanName}.${fileExt}`;
+                
+                const { data, error } = await supabaseClient.storage.from('menu-images').upload(`menu/${fileName}`, file);
+                
+                if (error) {
+                    alert("Erro no upload: " + error.message);
+                    statusDiv.style.display = 'none';
+                    return;
+                }
+                
+                const { data: { publicUrl } } = supabaseClient.storage.from('menu-images').getPublicUrl(`menu/${fileName}`);
+                imageUrl = publicUrl;
+                document.getElementById('item-image').value = imageUrl; // Atualiza o campo visualmente
+                statusDiv.style.display = 'none';
+            }
+
+            const itemData = {
+                nome: document.getElementById('item-name').value,
+                preco: price,
+                categoria: document.getElementById('item-category').value,
+                descricao: document.getElementById('item-description').value,
+                imagem_url: imageUrl,
+                disponivel: true,
+                dias_semana: days.length > 0 ? days : null,
+                hora_inicio: document.getElementById('item-start').value || null,
+                hora_fim: document.getElementById('item-end').value || null
+            };
+
+            console.log("Salvando dados:", itemData); // Para debug no console
+
+            const { error } = id ? await supabaseClient.from('menu_items').update(itemData).eq('id', id) : await supabaseClient.from('menu_items').insert([itemData]);
+            if (error) {
+                alert("Erro ao salvar: " + error.message);
+            } else {
+                alert("Salvo com sucesso!");
+                closeModal();
+                loadItems();
+            }
+        }
+
+        document.getElementById('login-form').addEventListener('submit', handleLogin);
+        document.getElementById('item-form').addEventListener('submit', handleSave);
+        checkSession();
+    </script>
+</body>
+</html>

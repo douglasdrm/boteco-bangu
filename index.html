@@ -51,21 +51,30 @@
     src="https://www.facebook.com/tr?id=915299581355320&ev=PageView&noscript=1"
     /></noscript>
     <!-- End Meta Pixel Code -->
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-V54PKFDRCZ"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-V54PKFDRCZ');
+    </script>
 </head>
 <body class="bg-gray-50 text-gray-900">
 
     <!-- Header / Navbar -->
     <nav class="fixed top-0 left-0 w-full z-50 transition-all duration-300 py-4 bg-transparent">
         <div class="container mx-auto px-4 flex justify-between items-center max-w-full">
-            <a href="index.html" class="flex items-center">
+            <a href="/" class="flex items-center">
                 <img src="assets/img/Logo_logo-site.png" alt="Boteco Bangu" class="h-12 md:h-16">
             </a>
             
             <!-- Desktop Menu -->
             <div class="hidden md:flex space-x-8 items-center font-bold text-white uppercase tracking-wider">
                 <a href="#inicio" class="hover:text-gold transition-colors">Início</a>
-                <a href="cardapio.html" class="hover:text-gold transition-colors">Cardápio</a>
-                <a href="jogos.html" class="text-gold animate-pulse"><i class="fas fa-gamepad mr-1"></i> Boteco Play</a>
+                <a href="/cardapio" class="hover:text-gold transition-colors">Cardápio</a>
+                <a href="/jogos" class="text-gold animate-pulse"><i class="fas fa-gamepad mr-1"></i> Boteco Play</a>
                 <a href="#galeria" class="hover:text-gold transition-colors">Galeria</a>
                 <a href="#contato" class="hover:text-gold transition-colors">Contato</a>
             </div>
@@ -79,8 +88,8 @@
         <!-- Mobile Menu -->
         <div id="mobile-menu" class="hidden md:hidden absolute top-full left-0 w-full p-6 flex flex-col space-y-4 text-white font-bold uppercase text-center shadow-xl">
             <a href="#inicio" class="py-2 hover:bg-red-800 rounded">Início</a>
-            <a href="cardapio.html" class="py-2 hover:bg-red-800 rounded">Cardápio</a>
-            <a href="jogos.html" class="py-2 text-gold border border-gold/30 rounded"><i class="fas fa-gamepad mr-1"></i> Boteco Play</a>
+            <a href="/cardapio" class="py-2 hover:bg-red-800 rounded">Cardápio</a>
+            <a href="/jogos" class="py-2 text-gold border border-gold/30 rounded"><i class="fas fa-gamepad mr-1"></i> Boteco Play</a>
             <a href="#galeria" class="py-2 hover:bg-red-800 rounded">Galeria</a>
             <a href="#contato" class="py-2 hover:bg-red-800 rounded">Contato</a>
         </div>
@@ -142,7 +151,7 @@
             <div class="max-w-4xl mx-auto mb-12">
                 <p class="text-xl text-gray-600">De clássicos como bolinho de feijoada a combos exclusivos para reunir a galera.</p>
             </div>
-            <a href="cardapio.html" class="btn-primary">Ver Cardápio Completo</a>
+            <a href="/cardapio" class="btn-primary">Ver Cardápio Completo</a>
         </div>
     </section>
 

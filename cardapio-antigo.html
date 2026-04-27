@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cardápio – Boteco Bangu – O boteco mais raiz do Rio</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        wine: '#7b1113',
+                        gold: '#facc15',
+                        'deep-red': '#4a0404',
+                    },
+                    fontFamily: {
+                        paytone: ['Paytone One', 'sans-serif'],
+                        montserrat: ['Montserrat', 'sans-serif'],
+                        inter: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Badge NOVIDADES - Petiscos Especiais */
+        @keyframes pulse-gold {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(250, 204, 21, 0.7), 0 0 12px rgba(250, 204, 21, 0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(250, 204, 21, 0), 0 0 24px rgba(250, 204, 21, 0.8); }
+        }
+        @keyframes badge-bounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-3px) scale(1.08); }
+        }
+        .btn-novidade {
+            border: 2px solid #facc15 !important;
+            animation: pulse-gold 2s ease-in-out infinite;
+            position: relative;
+        }
+        .badge-novo {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: linear-gradient(90deg, #facc15, #f59e0b);
+            color: #4a0404;
+            font-size: 0.65rem;
+            font-weight: 900;
+            letter-spacing: 0.07em;
+            padding: 2px 8px;
+            border-radius: 999px;
+            animation: badge-bounce 1.5s ease-in-out infinite;
+            white-space: nowrap;
+            text-transform: uppercase;
+        }
+    </style>
+
+
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Montserrat:wght@400;700;900&family=Paytone+One&display=swap"
+        rel="stylesheet">
+
+    <!-- Icons & Animations -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="assets/img/cropped-Logo_favicon.png">
+    <!-- Meta Pixel Code -->
+    <script>
+        !function (f, b, e, v, n, t, s) {
+            if (f.fbq) return; n = f.fbq = function () {
+                n.callMethod ?
+                n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+            };
+            if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0';
+            n.queue = []; t = b.createElement(e); t.async = !0;
+            t.src = v; s = b.getElementsByTagName(e)[0];
+            s.parentNode.insertBefore(t, s)
+        }(window, document, 'script',
+            'https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', '915299581355320');
+        fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none"
+            src="https://www.facebook.com/tr?id=915299581355320&ev=PageView&noscript=1" /></noscript>
+    <!-- End Meta Pixel Code -->
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-V54PKFDRCZ"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-V54PKFDRCZ');
+    </script>
+</head>
+
+<body class="bg-gray-50 text-gray-900 cardapio-bg">
+
+    <!-- Header / Navbar -->
+    <nav class="fixed top-0 left-0 w-full z-50 transition-all duration-300 py-4 bg-transparent">
+        <div class="container mx-auto px-4 flex justify-between items-center max-w-full">
+            <a href="/" class="flex items-center">
+                <img src="assets/img/Logo_logo-site.png" alt="Boteco Bangu" class="h-12 md:h-16">
+            </a>
+
+            <!-- Desktop Menu -->
+            <div class="hidden md:flex space-x-8 items-center font-bold text-white uppercase tracking-wider">
+                <a href="/#inicio" class="hover:text-gold transition-colors">Início</a>
+                <a href="/cardapio" class="text-gold border-b-2 border-gold pb-1">Cardápio</a>
+                <a href="/jogos" class="hover:text-gold transition-colors font-bold"><i
+                        class="fas fa-gamepad mr-1"></i> Boteco Play</a>
+                <a href="/#galeria" class="hover:text-gold transition-colors">Galeria</a>
+                <a href="/#contato" class="hover:text-gold transition-colors">Contato</a>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <button id="menu-btn" class="md:hidden text-white text-3xl">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu"
+            class="hidden md:hidden absolute top-full left-0 w-full p-6 flex flex-col space-y-4 text-white font-bold uppercase text-center shadow-xl">
+            <a href="/#inicio" class="py-2 hover:bg-red-800 rounded">Início</a>
+            <a href="/cardapio" class="py-2 bg-red-800 text-gold rounded border border-gold">Cardápio</a>
+            <a href="/jogos" class="py-2 text-gold border border-gold/30 rounded"><i
+                    class="fas fa-gamepad mr-1"></i> Boteco Play</a>
+            <a href="/#galeria" class="py-2 hover:bg-red-800 rounded">Galeria</a>
+            <a href="/#contato" class="py-2 hover:bg-red-800 rounded">Contato</a>
+        </div>
+    </nav>
+
+    <!-- Cardápio Header Section -->
+    <section class="pt-32 pb-12 text-white text-center">
+        <div class="container mx-auto px-4" data-aos="zoom-in">
+            <h1 class="text-4xl md:text-6xl font-paytone mb-4 uppercase">Nosso Cardápio</h1>
+            <p class="text-lg md:text-xl font-montserrat">Toque em uma categoria para ver as delícias.</p>
+        </div>
+    </section>
+
+    <!-- Cardápio Interactive Section -->
+    <section class="py-12 cardapio-section min-h-[80vh]">
+        <div class="container mx-auto px-4">
+
+            <!-- Category Buttons -->
+            <div class="flex flex-col max-w-2xl mx-auto gap-4 mb-12" data-aos="fade-up">
+                <button class="cardapio-btn active ativo w-full justify-between" data-img="assets/img/1.png">
+                    <span><i class="fas fa-utensils mr-3 text-xl"></i> Pratos para Compartilhar</span>
+                    <i class="fas fa-chevron-right opacity-30"></i>
+                </button>
+                <button class="cardapio-btn w-full justify-between" data-img="assets/img/2.png">
+                    <span><i class="fas fa-drumstick-bite mr-3 text-xl"></i> Petiscos</span>
+                    <i class="fas fa-chevron-right opacity-30"></i>
+                </button>
+                <button class="cardapio-btn btn-novidade w-full justify-between" data-img="assets/img/3.png">
+                    <span class="flex items-center gap-2 flex-wrap">
+                        <i class="fas fa-fire mr-1 text-xl text-gold"></i>
+                        Petiscos Especiais
+                        <span class="badge-novo">🔥 Novidades</span>
+                    </span>
+                    <i class="fas fa-chevron-right opacity-30"></i>
+                </button>
+                <button class="cardapio-btn w-full justify-between" data-img="assets/img/4.png">
+                    <span><i class="fas fa-hamburger mr-3 text-xl"></i> Sandubas e Porções</span>
+                    <i class="fas fa-chevron-right opacity-30"></i>
+                </button>
+                <button class="cardapio-btn w-full justify-between" data-img="assets/img/5.png">
+                    <span><i class="fas fa-cocktail mr-3 text-xl"></i> Bebidas e Drinks</span>
+                    <i class="fas fa-chevron-right opacity-30"></i>
+                </button>
+                <button class="cardapio-btn w-full justify-between" data-img="assets/img/6.png">
+                    <span><i class="fas fa-beer mr-3 text-xl"></i> Cerveja e Chopp</span>
+                    <i class="fas fa-chevron-right opacity-30"></i>
+                </button>
+                <button class="cardapio-btn w-full justify-between" data-img="assets/img/7.png">
+                    <span><i class="fas fa-wine-glass mr-3 text-xl"></i> Carta de Vinhos</span>
+                    <i class="fas fa-chevron-right opacity-30"></i>
+                </button>
+            </div>
+
+            <!-- Image Display -->
+            <div class="max-w-5xl mx-auto mb-20" data-aos="fade-up" data-aos-delay="200">
+                <div class="cardapio-frame cursor-zoom-in group relative" id="open-lightbox">
+                    <img id="cardapio-imagem" src="assets/img/1.png" alt="Cardápio"
+                        class="w-full h-auto transition-all duration-300 group-hover:brightness-90" loading="lazy">
+                    <div
+                        class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20">
+                        <span class="bg-white/90 text-red-900 px-4 py-2 rounded-full font-bold shadow-lg">
+                            <i class="fas fa-search-plus mr-2"></i> Clique para ampliar
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lightbox Modal -->
+            <div id="lightbox"
+                class="fixed inset-0 z-[100] bg-black/95 hidden flex-col items-center justify-center p-4">
+                <button id="close-lightbox"
+                    class="absolute top-6 right-6 text-white text-4xl hover:text-gold transition-colors">
+                    <i class="fas fa-times"></i>
+                </button>
+
+                <!-- Orientation Tip -->
+                <div id="orientation-tip"
+                    class="mb-4 bg-gold text-red-950 px-6 py-3 rounded-full font-bold shadow-xl animate-bounce flex items-center">
+                    <i class="fas fa-mobile-alt mr-3 text-2xl rotate-90"></i>
+                    Vire o celular para ver melhor!
+                </div>
+
+                <div class="max-w-full overflow-auto lightbox-content">
+                    <img id="lightbox-img" src="" alt="Cardápio Ampliado"
+                        class="max-w-full h-auto shadow-2xl rounded-lg">
+                </div>
+
+                <p class="text-white/60 mt-4 text-sm font-montserrat">Toque fora ou no X para fechar</p>
+            </div>
+
+            <div class="text-center mt-12" data-aos="fade-up">
+                <div class="inline-block bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-white/10">
+                    <h3 class="text-2xl font-paytone text-gold mb-4">AVISO IMPORTANTE</h3>
+                    <p class="text-gray-300 max-w-2xl mx-auto italic">
+                        * Preços e disponibilidade sujeitos a alteração sem aviso prévio. Consulte o garçom para saber
+                        sobre promoções do dia.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-red-900 text-white py-12">
+        <div class="container mx-auto px-4 text-center">
+            <img src="assets/img/Logo_logo-site.png" alt="Logo" class="h-20 mx-auto mb-6" loading="lazy">
+            <p class="text-xl font-montserrat italic mb-8">"O boteco mais raiz do Rio!"</p>
+            <div class="flex justify-center space-x-6 mb-8 text-2xl">
+                <a href="#"><i class="fab fa-facebook hover:text-gold transition-colors"></i></a>
+                <a href="https://instagram.com/boteco.bangu"><i
+                        class="fab fa-instagram hover:text-gold transition-colors"></i></a>
+                <a href="https://wa.me/5521966041648"><i
+                        class="fab fa-whatsapp hover:text-gold transition-colors"></i></a>
+            </div>
+            <div class="border-t border-red-800 pt-8 text-sm opacity-60">
+                <p>&copy; 2026 Boteco Bangu. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- WhatsApp Floating Button -->
+    <a href="https://wa.me/5521966041648" class="whatsapp-btn shadow-2xl" target="_blank">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script src="js/main.js"></script>
+</body>
+
+</html>

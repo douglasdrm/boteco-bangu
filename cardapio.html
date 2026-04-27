@@ -1,205 +1,235 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cardápio – Boteco Bangu – O boteco mais raiz do Rio</title>
-    
-    <!-- Tailwind CSS -->
+    <title>Cardápio – Boteco Bangu</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: {
-                        wine: '#7b1113',
-                        gold: '#facc15',
-                        'deep-red': '#4a0404',
-                    },
-                    fontFamily: {
-                        paytone: ['Paytone One', 'sans-serif'],
-                        montserrat: ['Montserrat', 'sans-serif'],
-                        inter: ['Inter', 'sans-serif'],
-                    }
+                    colors: { wine: '#7b1113', gold: '#facc15', 'deep-red': '#4a0404' },
+                    fontFamily: { paytone: ['Paytone One', 'sans-serif'], montserrat: ['Montserrat', 'sans-serif'], inter: ['Inter', 'sans-serif'] }
                 }
             }
         }
     </script>
-    
-    
-    <!-- Fonts -->
+
+    <style>
+        .cardapio-bg { background-color: #4a0404; background-image: linear-gradient(rgba(74, 4, 4, 0.94), rgba(74, 4, 4, 0.94)), url('assets/img/04.png'); background-attachment: fixed; background-size: cover; }
+        .master-btn { background: rgba(255, 255, 255, 0.05); color: rgba(255, 255, 255, 0.4); border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.3s ease; }
+        .master-btn.active { background-color: #facc15 !important; color: #4a0404 !important; border-color: #facc15; box-shadow: 0 10px 20px -5px rgba(250, 204, 21, 0.4); }
+        
+        .shortcut-pill { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); color: rgba(255, 255, 255, 0.5); white-space: nowrap; font-size: 0.65rem; padding: 8px 16px; border-radius: 999px; transition: all 0.3s; font-weight: bold; text-transform: uppercase; }
+        .shortcut-pill.active { background: rgba(250, 204, 21, 0.1); border-color: #facc15; color: #facc15; }
+
+        .menu-item-card { transition: all 0.2s ease; cursor: pointer; }
+        .menu-item-card:active { transform: scale(0.98); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .item-unavailable { opacity: 0.4; filter: grayscale(0.8); }
+        
+        .badge-schedule { background: rgba(250, 204, 21, 0.1); color: #facc15; border: 1px solid rgba(250, 204, 21, 0.2); font-size: 0.5rem; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; font-weight: 800; display: inline-flex; align-items: center; gap: 3px; }
+
+        @keyframes modalShow { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        .modal-content { animation: modalShow 0.3s ease; }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+    </style>
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Montserrat:wght@400;700;900&family=Paytone+One&display=swap" rel="stylesheet">
-    
-    <!-- Icons & Animations -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
-    
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/style.css">
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="assets/img/cropped-Logo_favicon.png">
-    <!-- Meta Pixel Code -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-V54PKFDRCZ"></script>
     <script>
-    !function(f,b,e,v,n,t,s)
-    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-    n.queue=[];t=b.createElement(e);t.async=!0;
-    t.src=v;s=b.getElementsByTagName(e)[0];
-    s.parentNode.insertBefore(t,s)}(window, document,'script',
-    'https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', '915299581355320');
-    fbq('track', 'PageView');
-    </script>
-    <noscript><img height="1" width="1" style="display:none"
-    src="https://www.facebook.com/tr?id=915299581355320&ev=PageView&noscript=1"
-    /></noscript>
-    <!-- End Meta Pixel Code -->
-</head>
-<body class="bg-gray-50 text-gray-900 cardapio-bg">
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
 
-    <!-- Header / Navbar -->
-    <nav class="fixed top-0 left-0 w-full z-50 transition-all duration-300 py-4 bg-transparent">
+      gtag('config', 'G-V54PKFDRCZ');
+    </script>
+</head>
+
+<body class="text-gray-100 cardapio-bg min-h-screen font-inter pb-20">
+
+    <nav class="fixed top-0 left-0 w-full z-[100] py-4 bg-red-900/95 shadow-lg border-b border-white/5">
         <div class="container mx-auto px-4 flex justify-between items-center max-w-full">
-            <a href="index.html" class="flex items-center">
-                <img src="assets/img/Logo_logo-site.png" alt="Boteco Bangu" class="h-12 md:h-16">
-            </a>
-            
-            <!-- Desktop Menu -->
-            <div class="hidden md:flex space-x-8 items-center font-bold text-white uppercase tracking-wider">
-                <a href="index.html#inicio" class="hover:text-gold transition-colors">Início</a>
-                <a href="cardapio.html" class="text-gold border-b-2 border-gold pb-1">Cardápio</a>
-                <a href="jogos.html" class="hover:text-gold transition-colors font-bold"><i class="fas fa-gamepad mr-1"></i> Boteco Play</a>
-                <a href="index.html#galeria" class="hover:text-gold transition-colors">Galeria</a>
-                <a href="index.html#contato" class="hover:text-gold transition-colors">Contato</a>
-            </div>
-            
-            <!-- Mobile Menu Button -->
-            <button id="menu-btn" class="md:hidden text-white text-3xl">
-                <i class="fas fa-bars"></i>
-            </button>
-        </div>
-        
-        <!-- Mobile Menu -->
-        <div id="mobile-menu" class="hidden md:hidden absolute top-full left-0 w-full p-6 flex flex-col space-y-4 text-white font-bold uppercase text-center shadow-xl">
-            <a href="index.html#inicio" class="py-2 hover:bg-red-800 rounded">Início</a>
-            <a href="cardapio.html" class="py-2 bg-red-800 text-gold rounded border border-gold">Cardápio</a>
-            <a href="jogos.html" class="py-2 text-gold border border-gold/30 rounded"><i class="fas fa-gamepad mr-1"></i> Boteco Play</a>
-            <a href="index.html#galeria" class="py-2 hover:bg-red-800 rounded">Galeria</a>
-            <a href="index.html#contato" class="py-2 hover:bg-red-800 rounded">Contato</a>
+            <a href="/"><img src="assets/img/Logo_logo-site.png" alt="Logo" class="h-10 md:h-14"></a>
+            <button id="menu-btn" class="md:hidden text-white text-2xl"><i class="fas fa-bars"></i></button>
         </div>
     </nav>
 
-    <!-- Cardápio Header Section -->
-    <section class="pt-32 pb-12 text-white text-center">
-        <div class="container mx-auto px-4" data-aos="zoom-in">
-            <h1 class="text-4xl md:text-6xl font-paytone mb-4 uppercase">Nosso Cardápio</h1>
-            <p class="text-lg md:text-xl font-montserrat">Toque em uma categoria para ver as delícias.</p>
+    <header class="pt-32 pb-6 text-center px-4">
+        <h1 class="text-4xl md:text-5xl font-paytone mb-1 uppercase text-gold">Nosso Cardápio</h1>
+    </header>
+
+    <!-- Sticky Header ajustado para não sobrepor -->
+    <div class="sticky top-[72px] md:top-[88px] z-50 bg-deep-red/95 backdrop-blur-xl border-y border-white/10 shadow-2xl pb-4">
+        <div class="container mx-auto px-4 pt-4 pb-2 flex justify-center gap-3">
+            <button onclick="setMasterFilter('comidas')" id="btn-comidas" class="master-btn active flex-1 md:flex-none md:w-56 py-3.5 rounded-2xl font-bold uppercase text-[0.7rem] flex items-center justify-center gap-2">
+                <i class="fas fa-ututensils"></i> COMIDAS
+            </button>
+            <button onclick="setMasterFilter('bebidas')" id="btn-bebidas" class="master-btn flex-1 md:flex-none md:w-56 py-3.5 rounded-2xl font-bold uppercase text-[0.7rem] flex items-center justify-center gap-2">
+                <i class="fas fa-glass-cheers"></i> BEBIDAS
+            </button>
         </div>
-    </section>
+        <div id="shortcut-container" class="container mx-auto px-4 pt-2 overflow-x-auto no-scrollbar flex gap-2 justify-start md:justify-center"></div>
+    </div>
 
-    <!-- Cardápio Interactive Section -->
-    <section class="py-12 cardapio-section min-h-[80vh]">
-        <div class="container mx-auto px-4">
-            
-            <!-- Category Buttons -->
-            <div class="flex flex-col max-w-2xl mx-auto gap-4 mb-12" data-aos="fade-up">
-                <button class="cardapio-btn active ativo w-full justify-between" data-img="assets/img/1.png">
-                    <span><i class="fas fa-utensils mr-3 text-xl"></i> Pratos para Compartilhar</span>
-                    <i class="fas fa-chevron-right opacity-30"></i>
-                </button>
-                <button class="cardapio-btn w-full justify-between" data-img="assets/img/2.png">
-                    <span><i class="fas fa-drumstick-bite mr-3 text-xl"></i> Petiscos</span>
-                    <i class="fas fa-chevron-right opacity-30"></i>
-                </button>
-                <button class="cardapio-btn w-full justify-between" data-img="assets/img/3.png">
-                    <span><i class="fas fa-star mr-3 text-xl"></i> Petiscos Especiais</span>
-                    <i class="fas fa-chevron-right opacity-30"></i>
-                </button>
-                <button class="cardapio-btn w-full justify-between" data-img="assets/img/4.png">
-                    <span><i class="fas fa-hamburger mr-3 text-xl"></i> Sandubas e Sobremesas</span>
-                    <i class="fas fa-chevron-right opacity-30"></i>
-                </button>
-                <button class="cardapio-btn w-full justify-between" data-img="assets/img/5.png">
-                    <span><i class="fas fa-cocktail mr-3 text-xl"></i> Bebidas e Drinks</span>
-                    <i class="fas fa-chevron-right opacity-30"></i>
-                </button>
-                <button class="cardapio-btn w-full justify-between" data-img="assets/img/6.png">
-                    <span><i class="fas fa-beer mr-3 text-xl"></i> Cerveja e Chopp</span>
-                    <i class="fas fa-chevron-right opacity-30"></i>
-                </button>
-                <button class="cardapio-btn w-full justify-between" data-img="assets/img/7.png">
-                    <span><i class="fas fa-wine-glass mr-3 text-xl"></i> Carta de Vinhos</span>
-                    <i class="fas fa-chevron-right opacity-30"></i>
-                </button>
-            </div>
+    <main class="py-8 px-4 container mx-auto max-w-4xl">
+        <div id="menu-container" class="space-y-12"></div>
+    </main>
 
-            <!-- Image Display -->
-            <div class="max-w-5xl mx-auto mb-20" data-aos="fade-up" data-aos-delay="200">
-                <div class="cardapio-frame cursor-zoom-in group relative" id="open-lightbox">
-                    <img id="cardapio-imagem" src="assets/img/1.png" alt="Cardápio" class="w-full h-auto transition-all duration-300 group-hover:brightness-90" loading="lazy">
-                    <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20">
-                        <span class="bg-white/90 text-red-900 px-4 py-2 rounded-full font-bold shadow-lg">
-                            <i class="fas fa-search-plus mr-2"></i> Clique para ampliar
-                        </span>
-                    </div>
+    <!-- Modal Detalhes -->
+    <div id="detail-modal" class="fixed inset-0 z-[110] bg-black/90 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="modal-content glass w-full max-w-lg rounded-3xl overflow-hidden relative">
+            <button onclick="closeDetail()" class="absolute top-4 right-4 z-20 bg-black/50 text-white w-10 h-10 rounded-full flex items-center justify-center"><i class="fas fa-times text-xl"></i></button>
+            <div id="modal-image-container" class="w-full h-64 md:h-80 overflow-hidden bg-white/5"><img id="modal-img" src="" class="w-full h-full object-cover"></div>
+            <div class="p-8">
+                <div id="modal-badge-container" class="mb-4"></div>
+                <div class="flex justify-between items-start gap-4 mb-4">
+                    <h2 id="modal-title" class="text-2xl font-paytone text-gold uppercase"></h2>
+                    <div id="modal-price" class="text-2xl font-bold text-white font-montserrat"></div>
                 </div>
-            </div>
-
-            <!-- Lightbox Modal -->
-            <div id="lightbox" class="fixed inset-0 z-[100] bg-black/95 hidden flex-col items-center justify-center p-4">
-                <button id="close-lightbox" class="absolute top-6 right-6 text-white text-4xl hover:text-gold transition-colors">
-                    <i class="fas fa-times"></i>
-                </button>
-                
-                <!-- Orientation Tip -->
-                <div id="orientation-tip" class="mb-4 bg-gold text-red-950 px-6 py-3 rounded-full font-bold shadow-xl animate-bounce flex items-center">
-                    <i class="fas fa-mobile-alt mr-3 text-2xl rotate-90"></i>
-                    Vire o celular para ver melhor!
-                </div>
-
-                <div class="max-w-full overflow-auto lightbox-content">
-                    <img id="lightbox-img" src="" alt="Cardápio Ampliado" class="max-w-full h-auto shadow-2xl rounded-lg">
-                </div>
-                
-                <p class="text-white/60 mt-4 text-sm font-montserrat">Toque fora ou no X para fechar</p>
-            </div>
-
-            <div class="text-center mt-12" data-aos="fade-up">
-                <div class="inline-block bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-white/10">
-                    <h3 class="text-2xl font-paytone text-gold mb-4">AVISO IMPORTANTE</h3>
-                    <p class="text-gray-300 max-w-2xl mx-auto italic">
-                        * Preços e disponibilidade sujeitos a alteração sem aviso prévio. Consulte o garçom para saber sobre promoções do dia.
-                    </p>
-                </div>
+                <p id="modal-desc" class="text-gray-300 text-sm md:text-base font-montserrat leading-relaxed mb-6"></p>
             </div>
         </div>
-    </section>
+    </div>
 
-    <!-- Footer -->
-    <footer class="bg-red-900 text-white py-12">
-        <div class="container mx-auto px-4 text-center">
-            <img src="assets/img/Logo_logo-site.png" alt="Logo" class="h-20 mx-auto mb-6" loading="lazy">
-            <p class="text-xl font-montserrat italic mb-8">"O boteco mais raiz do Rio!"</p>
-            <div class="flex justify-center space-x-6 mb-8 text-2xl">
-                <a href="#"><i class="fab fa-facebook hover:text-gold transition-colors"></i></a>
-                <a href="https://instagram.com/boteco.bangu"><i class="fab fa-instagram hover:text-gold transition-colors"></i></a>
-                <a href="https://wa.me/5521966041648"><i class="fab fa-whatsapp hover:text-gold transition-colors"></i></a>
-            </div>
-            <div class="border-t border-red-800 pt-8 text-sm opacity-60">
-                <p>&copy; 2026 Boteco Bangu. Todos os direitos reservados.</p>
-            </div>
-        </div>
-    </footer>
-
-    <!-- WhatsApp Floating Button -->
-    <a href="https://wa.me/5521966041648" class="whatsapp-btn shadow-2xl" target="_blank">
-        <i class="fab fa-whatsapp"></i>
-    </a>
-
-    <!-- Scripts -->
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
-    <script src="js/main.js"></script>
+    <script>
+        const SUPABASE_URL = "https://dhgfmfcupkysntxphepn.supabase.co"; 
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRoZ2ZtZmN1cGt5c250eHBoZXBuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NzUyMTYsImV4cCI6MjA5MjU1MTIxNn0.ahIgwSOq16X4dQBUDvSmiKUVgLl8E835EGRP4Wnxwyg";
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let allItems = [];
+        let currentMaster = 'comidas';
+        const COMIDAS_ORDER = ["Pratos Executivos", "Petiscos", "Pratos para Compartilhar", "Nossos Sandubas", "Porções", "Especiais do Boteco"];
+        let scrollObserver = null;
+
+        async function init() { AOS.init({ duration: 800, once: true }); await loadMenu(); }
+
+        async function loadMenu() {
+            const { data, error } = await supabaseClient.from('menu_items').select('*').eq('disponivel', true).order('ordem');
+            if (!error) allItems = data;
+            renderMenu();
+        }
+
+        function setMasterFilter(type) {
+            currentMaster = type;
+            document.querySelectorAll('.master-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`btn-${type}`).classList.add('active');
+            renderMenu();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function scrollToSection(id) {
+            const el = document.getElementById(id);
+            if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.pageYOffset - 240, behavior: 'smooth' });
+        }
+
+        function renderMenu() {
+            const container = document.getElementById('menu-container');
+            const shortcutContainer = document.getElementById('shortcut-container');
+            const day = new Date().getDay();
+            const time = new Date().getHours() * 60 + new Date().getMinutes();
+
+            const presentCats = [...new Set(allItems.map(i => i.categoria))];
+            let targetCats = currentMaster === 'comidas' 
+                ? COMIDAS_ORDER.filter(c => presentCats.includes(c))
+                : presentCats.filter(c => !COMIDAS_ORDER.includes(c));
+
+            const groups = targetCats.map(cat => {
+                const items = allItems.filter(i => i.categoria === cat).map(i => {
+                    let av = true;
+                    if (i.dias_semana && !i.dias_semana.includes(day)) av = false;
+                    if (av && i.hora_inicio && i.hora_fim) {
+                        const [hS, mS] = i.hora_inicio.split(':').map(Number);
+                        const [hE, mE] = i.hora_fim.split(':').map(Number);
+                        if (time < (hS*60+mS) || time > (hE*60+mE)) av = false;
+                    }
+                    return { ...i, isNow: av };
+                });
+                return { name: cat, id: 'sec-' + cat.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "").replace(/ /g, '-'), items };
+            }).filter(g => g.items.length > 0);
+
+            shortcutContainer.innerHTML = groups.map(g => `<button id="pill-${g.id}" onclick="scrollToSection('${g.id}')" class="shortcut-pill">${g.name}</button>`).join('');
+
+            container.innerHTML = groups.map(g => `
+                <section id="${g.id}" class="menu-section space-y-6">
+                    <h2 class="text-lg font-paytone text-gold uppercase border-b border-gold/20 pb-1 mb-6 inline-block">${g.name}</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2">
+                        ${g.items.map(item => `
+                            <div onclick="openDetail(${item.id})" class="menu-item-card flex bg-white/5 rounded-2xl overflow-hidden border border-white/5 mb-4 ${item.isNow ? '' : 'item-unavailable'}">
+                                ${item.imagem_url ? `<div class="w-24 md:w-32 h-24 md:h-auto overflow-hidden shrink-0"><img src="${item.imagem_url}" class="w-full h-full object-cover"></div>` : ''}
+                                <div class="p-4 flex-1 flex flex-col justify-center min-w-0">
+                                    <div class="flex justify-between items-start gap-4">
+                                        <h3 class="text-white font-bold text-[0.75rem] uppercase font-montserrat leading-tight">${item.nome}</h3>
+                                        <div class="text-gold font-bold text-[0.75rem] whitespace-nowrap shrink-0">R$ ${item.preco.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
+                                    </div>
+                                    <p class="text-gray-400 text-[0.65rem] mt-1 leading-snug">${item.descricao || ''}</p>
+                                    ${item.isNow ? '' : '<p class="text-[8px] text-red-400 font-bold uppercase mt-1">Indisponível agora</p>'}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </section>
+            `).join('');
+            
+            setTimeout(setupScrollHighlight, 100);
+        }
+
+        // Modal Logic
+        function openDetail(id) {
+            const item = allItems.find(i => i.id === id);
+            if (!item) return;
+
+            const modalImg = document.getElementById('modal-img');
+            const imgContainer = document.getElementById('modal-image-container');
+
+            if (item.imagem_url && item.imagem_url.length > 10) {
+                modalImg.src = item.imagem_url;
+                imgContainer.style.display = 'block';
+            } else {
+                imgContainer.style.display = 'none';
+            }
+
+            document.getElementById('modal-title').innerText = item.nome;
+            document.getElementById('modal-price').innerText = 'R$ ' + item.preco.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+            document.getElementById('modal-desc').innerText = item.descricao || '';
+            
+            const badge = document.getElementById('modal-badge-container');
+            badge.innerHTML = item.dias_semana ? `<div class="badge-schedule"><i class="fas fa-clock"></i> Disponibilidade Agendada</div>` : '';
+
+            document.getElementById('detail-modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDetail() { document.getElementById('detail-modal').classList.add('hidden'); document.body.style.overflow = 'auto'; }
+
+        function setupScrollHighlight() {
+            if (scrollObserver) scrollObserver.disconnect();
+            const options = { rootMargin: '-280px 0px -40% 0px', threshold: 0 };
+            scrollObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        document.querySelectorAll('.shortcut-pill').forEach(p => p.classList.remove('active'));
+                        const pill = document.getElementById('pill-' + entry.target.id);
+                        if (pill) {
+                            pill.classList.add('active');
+                            pill.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                        }
+                    }
+                });
+            }, options);
+            document.querySelectorAll('.menu-section').forEach(s => scrollObserver.observe(s));
+        }
+
+        init();
+    </script>
 </body>
 </html>
