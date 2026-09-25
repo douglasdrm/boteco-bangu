@@ -55,14 +55,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (cardapioButtons.length > 0 && mainImg) {
         cardapioButtons.forEach(button => {
-            button.addEventListener('click', function() {
+            button.addEventListener('click', function () {
                 const newImg = this.getAttribute('data-img');
-                
+
                 // Fade out & slight scale
                 mainImg.style.transition = 'all 0.4s ease-in-out';
                 mainImg.style.opacity = '0.3';
                 mainImg.style.transform = 'scale(0.98)';
-                
+
                 setTimeout(() => {
                     mainImg.src = newImg;
                     mainImg.onload = () => {
@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
             lightbox.classList.remove('hidden');
             lightbox.classList.add('flex');
             document.body.style.overflow = 'hidden'; // Prevent scroll
-            
+
             // Show tip and hide after 5 seconds
             if (orientationTip) {
                 orientationTip.style.opacity = '1';
@@ -130,27 +130,34 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Smooth Scroll for anchor links
-    document.querySelectorAll('a[href^="#"], a[href^="/#"]').forEach(anchor => {
+    // Smooth Scroll Apenas para Âncoras Internas (#)
+    document.querySelectorAll('a').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             let href = this.getAttribute('href');
-            
-            // Se o link começa com /# e estamos na raiz, remove o / para o scroll suave funcionar
+
+            if (!href) return;
+
+            // Tratamento para links no formato "/#galeria" estando na home
             if (href.startsWith('/#') && (window.location.pathname === '/' || window.location.pathname.endsWith('index.html'))) {
                 href = href.substring(1);
             }
 
+            // Se for um link de âncora que começa exatamente com '#'
             if (href.startsWith('#')) {
+                if (href === '#') return; // Se for apenas "#", ignora
+
                 const target = document.querySelector(href);
                 if (target) {
                     e.preventDefault();
-                    target.scrollIntoView({
-                        behavior: 'smooth'
-                    });
-                    // Close mobile menu if open
-                    if (mobileMenu) mobileMenu.classList.add('hidden');
+                    target.scrollIntoView({ behavior: 'smooth' });
+
+                    // Fecha o menu mobile se estiver aberto
+                    if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.add('hidden');
+                    }
                 }
             }
+            // Se for um link de rota (como /cardapio ou /jogos), deixa o navegador navegar normalmente
         });
     });
 });
