@@ -1,317 +1,1527 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Admin – Boteco Bangu</title>
+    <title>Painel Administrativo – Boteco Bangu</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Paytone+One&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        wine: {
+                            50: '#fef2f2',
+                            100: '#fee2e2',
+                            500: '#ef4444',
+                            700: '#b91c1c',
+                            800: '#991b1b',
+                            900: '#7f1d1d',
+                            950: '#450a0a',
+                        },
+                        gold: {
+                            400: '#fbbf24',
+                            500: '#facc15',
+                            600: '#d97706',
+                        },
+                        darkBg: '#0f0f12',
+                        darkCard: '#1a1a24',
+                        darkInput: '#262635'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Cropper.js CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
     
     <style>
-        body { font-family: 'Montserrat', sans-serif; }
-        .font-paytone { font-family: 'Paytone One', sans-serif; }
-        #upload-status { display: none; position: fixed; bottom: 20px; right: 20px; z-index: 1000; }
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #0f0f12;
+        }
+        .font-montserrat {
+            font-family: 'Montserrat', sans-serif;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f0f12;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #262635;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #b91c1c;
+        }
+        /* Dia pills no modal de horário */
+        .dia-pill {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.3rem 0.75rem;
+            border-radius: 9999px;
+            border: 1px solid #374151;
+            background: #1a1a2e;
+            color: #9ca3af;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            letter-spacing: 0.05em;
+            user-select: none;
+        }
+        .dia-pill:hover {
+            border-color: #9ca3af;
+            color: #e5e7eb;
+        }
+        .dia-pill--active {
+            background: #b91c1c;
+            border-color: #b91c1c;
+            color: #fff;
+        }
     </style>
-
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-V54PKFDRCZ"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'G-V54PKFDRCZ');
-    </script>
 </head>
+<body class="text-gray-100 min-h-screen pb-20">
 
-<body class="bg-gray-100 text-gray-900">
-
-    <div id="upload-status" class="bg-blue-600 text-white px-6 py-3 rounded-xl shadow-2xl flex items-center gap-3 animate-bounce">
-        <i class="fas fa-spinner fa-spin"></i>
-        <span class="font-bold text-sm">SUBINDO IMAGEM...</span>
-    </div>
-
-    <!-- Login Screen -->
-    <div id="login-screen" class="min-h-screen flex items-center justify-center p-4">
-        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md border-t-8 border-red-800">
-            <div class="text-center mb-8">
-                <img src="assets/img/Logo_logo-site.png" alt="Logo" class="h-20 mx-auto mb-4 grayscale brightness-0">
-                <h1 class="text-2xl font-paytone text-red-800 uppercase">Acesso Restrito</h1>
+    <!-- Header / Navbar -->
+    <nav class="bg-darkCard border-b border-gray-800 py-4 sticky top-0 z-40 shadow-xl">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <img src="assets/img/Logo_logo-site.png" alt="Boteco Bangu" class="h-10 md:h-12">
+                <span class="text-xl font-bold uppercase tracking-wider text-white hidden md:inline">Painel Admin</span>
             </div>
-            <form id="login-form" class="space-y-4">
-                <input type="email" id="email" placeholder="E-mail" required class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg">
-                <input type="password" id="password" placeholder="Senha" required class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg">
-                <button type="submit" class="w-full bg-red-800 text-white font-bold py-3 rounded-lg hover:bg-red-900 transition-colors">ENTRAR</button>
-            </form>
+            
+            <div class="flex space-x-4 items-center">
+                <a href="cardapio.html" target="_blank" class="px-4 py-2 bg-wine-900/50 hover:bg-wine-900 border border-wine-800 text-gold-500 font-semibold rounded-lg text-sm transition-all duration-300 flex items-center gap-2">
+                    <i class="fas fa-eye"></i> Ver Cardápio
+                </a>
+            </div>
         </div>
-    </div>
+    </nav>
 
-    <!-- Admin Dashboard -->
-    <div id="admin-dashboard" class="hidden min-h-screen flex flex-col">
-        <header class="bg-red-900 text-white p-4 shadow-lg sticky top-0 z-30">
-            <div class="container mx-auto flex justify-between items-center">
-                <h2 class="font-paytone uppercase">Admin Cardápio</h2>
-                <button onclick="handleLogout()" class="text-sm font-bold"><i class="fas fa-sign-out-alt"></i> SAIR</button>
-            </div>
-        </header>
-
-        <main class="flex-1 container mx-auto p-4 md:p-8">
-            <div class="flex justify-between items-center mb-8">
-                <h1 class="text-2xl font-paytone text-gray-800 uppercase tracking-tighter">Seus Pratos</h1>
-                <button onclick="openModal()" class="bg-green-600 text-white font-bold px-6 py-3 rounded-xl hover:bg-green-700 shadow-lg">+ NOVO PRATO</button>
-            </div>
-
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-                <div class="p-4 border-b border-gray-100">
-                    <input type="text" id="search-input" oninput="renderTable()" placeholder="Buscar por nome ou categoria..." class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none">
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left">
-                        <thead class="bg-gray-50 border-b border-gray-100">
-                            <tr>
-                                <th class="p-4 text-xs font-bold uppercase text-gray-400">Prato</th>
-                                <th class="p-4 text-xs font-bold uppercase text-gray-400">Categoria</th>
-                                <th class="p-4 text-xs font-bold uppercase text-gray-400">Preço</th>
-                                <th class="p-4 text-xs font-bold uppercase text-gray-400 text-right">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="items-list" class="divide-y divide-gray-100"></tbody>
-                    </table>
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 pt-8">
+        
+        <!-- Supabase Connection Status -->
+        <div id="connection-status" class="mb-8 p-4 rounded-xl border flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all duration-300">
+            <div class="flex items-center space-x-3">
+                <div class="w-3 h-3 rounded-full animate-pulse" id="status-dot"></div>
+                <div>
+                    <h3 class="font-bold text-sm" id="status-title">Conectando...</h3>
+                    <p class="text-xs text-gray-400" id="status-desc">Verificando chaves de acesso ao Supabase...</p>
                 </div>
             </div>
-        </main>
-    </div>
-
-    <!-- Modal -->
-    <div id="item-modal" class="fixed inset-0 z-[100] bg-black/60 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-y-auto max-h-[90vh]">
-            <div class="bg-red-800 p-6 text-white flex justify-between items-center sticky top-0 z-10">
-                <h2 id="modal-title" class="text-xl font-paytone uppercase">Editar Prato</h2>
-                <button onclick="closeModal()" class="text-white/70"><i class="fas fa-times text-2xl"></i></button>
+            <div id="status-action" class="hidden">
+                <span class="text-xs px-3 py-1 bg-yellow-500/10 text-yellow-500 border border-yellow-500/30 rounded-full font-medium">Modo Demo Ativo (LocalStorage)</span>
             </div>
+        </div>
+
+        <!-- Dashboard Stats & Switch Especial -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            
+            <!-- Card Switch Preços Especiais -->
+            <div class="bg-darkCard border border-gray-800 rounded-2xl p-6 shadow-lg flex flex-col justify-between">
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <h2 class="font-montserrat font-bold text-lg text-white uppercase tracking-wider">Modo Dia Especial</h2>
+                        <i class="fas fa-calendar-star text-gold-500 text-xl"></i>
+                    </div>
+                    <p class="text-sm text-gray-400 leading-relaxed mb-6">
+                        Ao ativar, os preços especiais de feriados/dias especiais serão exibidos de forma totalmente invisível para os clientes.
+                    </p>
+                </div>
+                
+                <div class="flex items-center justify-between bg-darkBg/60 p-4 rounded-xl border border-gray-800/80">
+                    <span class="text-sm font-semibold text-gray-300">Preços Especiais de Feriado</span>
+                    <button id="switch-precos-festivos" class="w-14 h-8 bg-gray-700 rounded-full relative transition-colors duration-300 focus:outline-none border border-gray-600">
+                        <span class="w-6 h-6 bg-white rounded-full absolute top-1 left-1 transition-transform duration-300 shadow-md flex items-center justify-center">
+                            <i class="fas fa-times text-xs text-gray-400" id="switch-icon"></i>
+                        </span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats 1: Total Itens -->
+            <div class="bg-darkCard border border-gray-800 rounded-2xl p-6 shadow-lg flex items-center justify-between">
+                <div class="space-y-1">
+                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-widest">Total de Pratos</p>
+                    <h3 class="text-4xl font-bold font-montserrat text-white" id="stat-total-items">0</h3>
+                    <p class="text-xs text-green-400 flex items-center gap-1 pt-1">
+                        <i class="fas fa-check-circle"></i> Sincronizados
+                    </p>
+                </div>
+                <div class="w-12 h-12 bg-wine-900/40 border border-wine-800 text-wine-500 rounded-2xl flex items-center justify-center text-xl shadow-lg">
+                    <i class="fas fa-utensils"></i>
+                </div>
+            </div>
+
+            <!-- Stats 2: Categorias -->
+            <div class="bg-darkCard border border-gray-800 rounded-2xl p-6 shadow-lg flex items-center justify-between">
+                <div class="space-y-1">
+                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-widest">Categorias</p>
+                    <h3 class="text-4xl font-bold font-montserrat text-white" id="stat-total-categories">0</h3>
+                    <p class="text-xs text-gold-500 flex items-center gap-1 pt-1">
+                        <i class="fas fa-tags"></i> Menus Ativos
+                    </p>
+                </div>
+                <div class="w-12 h-12 bg-gold-600/20 border border-gold-600/30 text-gold-500 rounded-2xl flex items-center justify-center text-xl shadow-lg">
+                    <i class="fas fa-folder"></i>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Main Items Table / Header -->
+        <div class="bg-darkCard border border-gray-800 rounded-2xl overflow-hidden shadow-2xl">
+            
+            <!-- Table Controls -->
+            <div class="p-6 border-b border-gray-800 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-darkCard">
+                <div>
+                    <h2 class="font-montserrat font-bold text-xl text-white uppercase">Menu de Pratos</h2>
+                    <p class="text-xs text-gray-400 mt-1">Gerencie pratos, duplique para cadastros rápidos e ative múltiplos preços.</p>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row items-center gap-3">
+                    <!-- Search Input -->
+                    <div class="relative w-full sm:w-64">
+                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                        <input type="text" id="search-input" placeholder="Buscar prato..." class="w-full pl-9 pr-4 py-2 rounded-lg bg-darkInput border border-gray-800 text-sm focus:outline-none focus:border-wine-700 text-gray-100 transition-colors">
+                    </div>
+                    
+                    <!-- Category Select -->
+                    <select id="category-filter" class="w-full sm:w-48 px-3 py-2 rounded-lg bg-darkInput border border-gray-800 text-sm focus:outline-none focus:border-wine-700 text-gray-100 transition-colors">
+                        <option value="">Todas as Categorias</option>
+                        <option value="Especialidades da Casa">Especialidades da Casa</option>
+                        <option value="Pratos Executivos">Pratos Executivos</option>
+                        <option value="Pratos para Compartilhar">Pratos para Compartilhar</option>
+                        <option value="Para Beliscar">Para Beliscar</option>
+                        <option value="Porções">Porções</option>
+                        <option value="Nossos Sandubas">Nossos Sandubas</option>
+                        <option value="Kids">Kids</option>
+                        <option value="Sobremesas">Sobremesas</option>
+                        <option value="Bebidas sem Álcool">Bebidas sem Álcool</option>
+                        <option value="Nossos Drinks">Nossos Drinks</option>
+                        <option value="Cervejas">Cervejas</option>
+                        <option value="Chopps">Chopps</option>
+                        <option value="Vinhos">Vinhos</option>
+                    </select>
+
+                    <!-- Manage Categories Button -->
+                    <button id="btn-manage-categories" class="w-full sm:w-auto px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white font-bold rounded-lg text-sm transition-colors flex items-center justify-center gap-2 border border-gray-700 shadow-md">
+                        <i class="fas fa-tags"></i> Categorias
+                    </button>
+
+                    <!-- Add Button -->
+                    <button id="btn-add-item" class="w-full sm:w-auto px-4 py-2 bg-wine-700 hover:bg-wine-800 text-white font-bold rounded-lg text-sm transition-colors flex items-center justify-center gap-2 shadow-lg">
+                        <i class="fas fa-plus"></i> Novo Prato
+                    </button>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-darkBg border-b border-gray-800 text-xs font-bold text-gray-400 uppercase tracking-wider">
+                            <th class="p-4 w-10 text-center text-gray-500 drag-header hidden"><i class="fas fa-sort"></i></th>
+                            <th class="p-4 pl-6">Foto</th>
+                            <th class="p-4">Nome / Descrição</th>
+                            <th class="p-4">Categoria</th>
+                            <th class="p-4 text-right">Preço Padrão</th>
+                            <th class="p-4 text-right text-gold-500">Preço Feriado</th>
+                            <th class="p-4 text-center">Status</th>
+                            <th class="p-4 pr-6 text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="items-table-body" class="divide-y divide-gray-800/60">
+                        <tr>
+                            <td colspan="8" class="p-8 text-center text-gray-400">
+                                <i class="fas fa-spinner fa-spin text-2xl text-wine-700 mb-2"></i>
+                                <p>Carregando pratos...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Modal Form (Add / Edit / Duplicate) -->
+    <div id="item-modal" class="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-darkCard border border-gray-800 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300">
+            
+            <!-- Modal Header -->
+            <div class="px-6 py-4 border-b border-gray-800 flex justify-between items-center bg-darkBg">
+                <h3 id="modal-title" class="font-montserrat font-bold text-lg text-white uppercase">Novo Prato</h3>
+                <button id="btn-close-modal" class="text-gray-400 hover:text-white text-xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <!-- Modal Form -->
             <form id="item-form" class="p-6 space-y-4">
-                <input type="hidden" id="item-id">
+                <input type="hidden" id="form-item-id">
+                
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="md:col-span-2">
-                        <label class="block text-xs font-bold uppercase mb-1">Nome</label>
-                        <input type="text" id="item-name" required class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                    <!-- Nome -->
+                    <div class="space-y-1">
+                        <label for="form-nome" class="text-xs font-semibold text-gray-400 uppercase">Nome do Prato *</label>
+                        <input type="text" id="form-nome" required placeholder="Ex: Bolinho de Feijoada" class="w-full px-3 py-2 rounded-lg bg-darkInput border border-gray-800 focus:outline-none focus:border-wine-700 text-gray-100 text-sm">
                     </div>
-                    <div>
-                        <label class="block text-xs font-bold uppercase mb-1">Preço</label>
-                        <input type="text" id="item-price" required class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg font-bold text-red-800">
+                    
+                    <!-- Categoria -->
+                    <div class="space-y-1">
+                        <label for="form-categoria" class="text-xs font-semibold text-gray-400 uppercase">Categoria *</label>
+                        <select id="form-categoria" required class="w-full px-3 py-2 rounded-lg bg-darkInput border border-gray-800 focus:outline-none focus:border-wine-700 text-gray-100 text-sm">
+                            <option value="">Selecione...</option>
+                            <option value="Especialidades da Casa">Especialidades da Casa</option>
+                            <option value="Pratos Executivos">Pratos Executivos</option>
+                            <option value="Pratos para Compartilhar">Pratos para Compartilhar</option>
+                            <option value="Para Beliscar">Para Beliscar</option>
+                            <option value="Porções">Porções</option>
+                            <option value="Nossos Sandubas">Nossos Sandubas</option>
+                            <option value="Kids">Kids</option>
+                            <option value="Sobremesas">Sobremesas</option>
+                            <option value="Bebidas sem Álcool">Bebidas sem Álcool</option>
+                            <option value="Nossos Drinks">Nossos Drinks</option>
+                            <option value="Cervejas">Cervejas</option>
+                            <option value="Chopps">Chopps</option>
+                            <option value="Vinhos">Vinhos</option>
+                        </select>
                     </div>
-                    <div>
-                        <div class="flex justify-between items-center mb-1">
-                            <label class="block text-xs font-bold uppercase">Categoria</label>
-                            <button type="button" onclick="addCategory()" class="text-[10px] font-bold text-blue-600">+ NOVA</button>
+                </div>
+
+                <!-- Descrição -->
+                <div class="space-y-1">
+                    <label for="form-descricao" class="text-xs font-semibold text-gray-400 uppercase">Descrição do Prato</label>
+                    <textarea id="form-descricao" rows="2" placeholder="Descreva os ingredientes..." class="w-full px-3 py-2 rounded-lg bg-darkInput border border-gray-800 focus:outline-none focus:border-wine-700 text-gray-100 text-sm resize-none"></textarea>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Preço Padrão -->
+                    <div class="space-y-1">
+                        <label for="form-preco" class="text-xs font-semibold text-gray-400 uppercase">Preço Padrão *</label>
+                        <input type="text" id="form-preco" required placeholder="R$ 0,00" class="w-full px-3 py-2 rounded-lg bg-darkInput border border-gray-800 focus:outline-none focus:border-wine-700 text-gray-100 text-sm">
+                    </div>
+                    
+                    <!-- Preço Feriado -->
+                    <div class="space-y-1">
+                        <label for="form-preco-especial" class="text-xs font-semibold text-gray-400 uppercase text-gold-500">Preço Dia Especial *</label>
+                        <input type="text" id="form-preco-especial" required placeholder="R$ 0,00" class="w-full px-3 py-2 rounded-lg bg-darkInput border border-gray-800 focus:outline-none focus:border-wine-700 text-gray-100 text-sm text-gold-400 font-semibold">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- Imagem URL / Upload -->
+                    <div class="md:col-span-2 space-y-1">
+                        <div class="flex justify-between items-center">
+                            <label class="text-xs font-semibold text-gray-400 uppercase">Imagem do Prato</label>
+                            <span id="upload-status" class="text-xs text-gray-400"></span>
                         </div>
-                        <select id="item-category" required class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg"></select>
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-xs font-bold uppercase mb-1">Descrição</label>
-                        <textarea id="item-description" rows="2" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm"></textarea>
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-xs font-bold uppercase mb-1">Imagem</label>
-                        <input type="file" id="item-file" accept="image/*" class="w-full text-sm bg-gray-50 p-2 border border-gray-200 rounded-lg">
-                        <input type="url" id="item-image" placeholder="URL da imagem (opcional)" class="w-full p-2 mt-2 bg-gray-50 border border-gray-200 rounded-lg text-xs">
-                    </div>
-                    <div class="md:col-span-2 border-t border-gray-100 pt-4">
-                        <div class="flex justify-between items-center mb-3">
-                            <p class="text-xs font-bold uppercase text-red-800">Disponibilidade</p>
-                            <button type="button" onclick="selectAllDays()" class="text-[9px] font-bold bg-gray-200 px-2 py-1 rounded">TODOS</button>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <!-- Input para Upload Direto -->
+                            <div class="relative">
+                                <input type="file" id="form-imagem-file" accept="image/*" class="hidden">
+                                <label for="form-imagem-file" class="w-full h-[38px] px-3 bg-darkInput border border-gray-800 hover:border-wine-700 rounded-lg text-sm text-gray-300 flex items-center justify-center gap-2 cursor-pointer transition-colors">
+                                    <i class="fas fa-cloud-upload-alt text-wine-500" id="upload-icon"></i>
+                                    <span id="upload-label">Subir Imagem</span>
+                                </label>
+                            </div>
+                            <!-- Campo de URL original -->
+                            <input type="url" id="form-imagem" placeholder="Ou cole a URL da imagem..." class="w-full px-3 py-2 rounded-lg bg-darkInput border border-gray-800 focus:outline-none focus:border-wine-700 text-gray-100 text-sm">
                         </div>
-                        <div class="grid grid-cols-4 md:grid-cols-7 gap-2 mb-4">
-                            <label class="flex flex-col items-center gap-1 text-[9px] bg-gray-50 p-2 rounded border border-gray-100"><input type="checkbox" name="days" value="1"> Seg</label>
-                            <label class="flex flex-col items-center gap-1 text-[9px] bg-gray-50 p-2 rounded border border-gray-100"><input type="checkbox" name="days" value="2"> Ter</label>
-                            <label class="flex flex-col items-center gap-1 text-[9px] bg-gray-50 p-2 rounded border border-gray-100"><input type="checkbox" name="days" value="3"> Qua</label>
-                            <label class="flex flex-col items-center gap-1 text-[9px] bg-gray-50 p-2 rounded border border-gray-100"><input type="checkbox" name="days" value="4"> Qui</label>
-                            <label class="flex flex-col items-center gap-1 text-[9px] bg-gray-50 p-2 rounded border border-gray-100"><input type="checkbox" name="days" value="5"> Sex</label>
-                            <label class="flex flex-col items-center gap-1 text-[9px] bg-gray-50 p-2 rounded border border-gray-100"><input type="checkbox" name="days" value="6"> Sab</label>
-                            <label class="flex flex-col items-center gap-1 text-[9px] bg-gray-50 p-2 rounded border border-gray-100"><input type="checkbox" name="days" value="0"> Dom</label>
+                    </div>
+
+                    <!-- Disponível / Ordem -->
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="space-y-1">
+                            <label for="form-ordem" class="text-xs font-semibold text-gray-400 uppercase">Ordem</label>
+                            <input type="number" id="form-ordem" min="0" value="0" class="w-full px-3 py-2 rounded-lg bg-darkInput border border-gray-800 focus:outline-none focus:border-wine-700 text-gray-100 text-sm">
                         </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <input type="time" id="item-start" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-sm">
-                            <input type="time" id="item-end" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-sm">
+                        <div class="space-y-1 flex flex-col justify-end pb-2 pl-2">
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="checkbox" id="form-disponivel" checked class="w-4 h-4 rounded border-gray-800 text-wine-700 focus:ring-wine-700 focus:ring-opacity-25 bg-darkInput">
+                                <span class="text-xs font-semibold text-gray-400 uppercase">Ativo</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Disponibilidade por Dias e Horários -->
+                    <div class="border-t border-gray-800/60 pt-4 space-y-3">
+                        <h4 class="text-xs font-bold text-wine-500 uppercase tracking-wider flex items-center gap-2">
+                            <i class="fas fa-clock text-wine-500"></i> Restrição de Horário (Opcional)
+                        </h4>
+
+                        <!-- Dias da Semana -->
+                        <div class="space-y-2">
+                            <label class="text-xs font-semibold text-gray-400 uppercase">Dias Disponíveis</label>
+                            <div class="flex flex-wrap gap-1.5 pt-0.5">
+                                <label class="dia-pill"><input type="checkbox" name="form-dias" value="1" class="sr-only"><span>Seg</span></label>
+                                <label class="dia-pill"><input type="checkbox" name="form-dias" value="2" class="sr-only"><span>Ter</span></label>
+                                <label class="dia-pill"><input type="checkbox" name="form-dias" value="3" class="sr-only"><span>Qua</span></label>
+                                <label class="dia-pill"><input type="checkbox" name="form-dias" value="4" class="sr-only"><span>Qui</span></label>
+                                <label class="dia-pill"><input type="checkbox" name="form-dias" value="5" class="sr-only"><span>Sex</span></label>
+                                <label class="dia-pill"><input type="checkbox" name="form-dias" value="6" class="sr-only"><span>Sáb</span></label>
+                                <label class="dia-pill"><input type="checkbox" name="form-dias" value="0" class="sr-only"><span>Dom</span></label>
+                            </div>
+                            <p class="text-[10px] text-gray-500">Se nenhum selecionado, ficará disponível todos os dias.</p>
+                        </div>
+
+                        <!-- Horários -->
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="space-y-1">
+                                <label for="form-hora-inicio" class="text-xs font-semibold text-gray-400 uppercase">Hora Início</label>
+                                <input type="time" id="form-hora-inicio" class="w-full px-3 py-2 rounded-lg bg-darkInput border border-gray-800 focus:outline-none focus:border-wine-700 text-gray-100 text-sm">
+                            </div>
+                            <div class="space-y-1">
+                                <label for="form-hora-fim" class="text-xs font-semibold text-gray-400 uppercase">Hora Término</label>
+                                <input type="time" id="form-hora-fim" class="w-full px-3 py-2 rounded-lg bg-darkInput border border-gray-800 focus:outline-none focus:border-wine-700 text-gray-100 text-sm">
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="pt-4 flex gap-3">
-                    <button type="button" onclick="closeModal()" class="flex-1 py-3 font-bold text-gray-500 bg-gray-100 rounded-lg">CANCELAR</button>
-                    <button type="submit" class="flex-2 grow bg-red-800 text-white font-bold py-3 px-8 rounded-lg">SALVAR PRATO</button>
+
+                <!-- Buttons -->
+                <div class="pt-4 border-t border-gray-800 flex justify-end space-x-3">
+                    <button type="button" id="btn-cancel" class="px-4 py-2 border border-gray-800 hover:bg-gray-800 text-gray-300 font-bold rounded-lg text-sm transition-colors">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="px-5 py-2 bg-wine-700 hover:bg-wine-800 text-white font-bold rounded-lg text-sm transition-colors shadow-lg">
+                        Salvar Alterações
+                    </button>
                 </div>
             </form>
+
         </div>
     </div>
 
+    <!-- Scripts -->
+    <!-- Cropper.js JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script>
-        const SUPABASE_URL = "https://dhgfmfcupkysntxphepn.supabase.co"; 
-        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRoZ2ZtZmN1cGt5c250eHBoZXBuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NzUyMTYsImV4cCI6MjA5MjU1MTIxNn0.ahIgwSOq16X4dQBUDvSmiKUVgLl8E835EGRP4Wnxwyg";
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // Configuração direta do Supabase para evitar erros de arquivo externo ausente em produção
+        const SUPABASE_URL = "https://dhgfmfcupkysntxphepn.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRoZ2ZtZmN1cGt5c250eHBoZXBuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NzUyMTYsImV4cCI6MjA5MjU1MTIxNn0.ahIgwSOq16X4dQBUDvSmiKUVgLl8E835EGRP4Wnxwyg";
 
-        let menuItems = [];
-        let categories = ["Petiscos", "Pratos para Compartilhar", "Bebidas sem Álcool", "Nossos Drinks", "Nossos Sandubas", "Porções", "Especiais do Boteco", "Cervejas", "Chopps", "Carta de Vinhos", "Pratos Executivos"];
+        let supabaseClient = null;
 
-        // Moeda
-        document.getElementById('item-price').addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, "");
-            value = (value / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-            e.target.value = value;
+        if (typeof supabase !== 'undefined') {
+            if (SUPABASE_URL !== "" && SUPABASE_ANON_KEY !== "") {
+                supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            } else {
+                console.warn("Supabase: Por favor, insira as credenciais de URL e Anon Key corretas.");
+            }
+        } else {
+            console.error("Supabase: A biblioteca do Supabase não foi carregada no documento HTML.");
+        }
+    </script>
+
+    <!-- Admin Interactive Logic -->
+    <script>
+        const MOCK_DEFAULT_ITEMS = [
+            { id: 1, nome: "Carne de Sol com Aipim", descricao: "Carne de sol acebolada grelhada com aipim frito na manteiga de garrafa.", preco: 89.90, preco_especial: 99.90, categoria: "Pratos para Compartilhar", ordem: 1, disponivel: true, imagem_url: "" }
+        ];
+
+        const DEFAULT_CATEGORIES = [
+            "Pratos Executivos",
+            "Petiscos",
+            "Pratos para Compartilhar",
+            "Nossos Sandubas",
+            "Porções",
+            "Especiais do Boteco",
+            "Bebidas sem Álcool",
+            "Nossos Drinks",
+            "Cervejas",
+            "Chopps",
+            "Carta de Vinhos"
+        ];
+        let customCategories = JSON.parse(localStorage.getItem('boteco_bangu_custom_categories') || '[]');
+
+        let useDemoMode = false;
+        let allItems = [];
+        let configPrecosFestivos = false;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await initConnection();
+            await fetchData();
+            setupEventListeners();
         });
 
-        function renderCategorySelect() {
-            const select = document.getElementById('item-category');
-            select.innerHTML = categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
-        }
+        function populateCategoryDropdowns() {
+            const filterSelect = document.getElementById('category-filter');
+            const formSelect = document.getElementById('form-categoria');
+            
+            const prevFilterVal = filterSelect.value;
+            const prevFormVal = formSelect.value;
 
-        function addCategory() {
-            const newCat = prompt("Nova categoria:");
-            if (newCat && !categories.includes(newCat)) { categories.push(newCat); renderCategorySelect(); document.getElementById('item-category').value = newCat; }
-        }
+            const dbCategories = [...new Set(allItems.map(item => item.categoria))].filter(Boolean);
+            const allCategoriesSet = new Set([
+                ...DEFAULT_CATEGORIES,
+                ...dbCategories,
+                ...customCategories
+            ]);
+            const uniqueCategories = Array.from(allCategoriesSet).sort();
 
-        function selectAllDays() { document.querySelectorAll('input[name="days"]').forEach(cb => cb.checked = true); }
+            filterSelect.innerHTML = '<option value="">Todas as Categorias</option>';
+            uniqueCategories.forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat;
+                opt.textContent = cat;
+                filterSelect.appendChild(opt);
+            });
+            filterSelect.value = prevFilterVal;
 
-        async function checkSession() {
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            if (session) showDashboard(); else showLogin();
-        }
-
-        function showDashboard() {
-            document.getElementById('login-screen').classList.add('hidden');
-            document.getElementById('admin-dashboard').classList.remove('hidden');
-            loadItems();
-        }
-
-        function showLogin() {
-            document.getElementById('login-screen').classList.remove('hidden');
-            document.getElementById('admin-dashboard').classList.add('hidden');
-        }
-
-        async function handleLogin(e) {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
-            if (error) alert(error.message); else showDashboard();
-        }
-
-        async function handleLogout() { await supabaseClient.auth.signOut(); window.location.reload(); }
-
-        async function loadItems() {
-            const { data, error } = await supabaseClient.from('menu_items').select('*').order('categoria');
-            if (!error) {
-                menuItems = data;
-                const dbCats = [...new Set(menuItems.map(i => i.categoria))];
-                dbCats.forEach(c => { if(!categories.includes(c)) categories.push(c); });
-                renderCategorySelect();
-                renderTable();
+            formSelect.innerHTML = '<option value="">Selecione...</option>';
+            uniqueCategories.forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat;
+                opt.textContent = cat;
+                formSelect.appendChild(opt);
+            });
+            if (uniqueCategories.includes(prevFormVal)) {
+                formSelect.value = prevFormVal;
             }
+        }
+
+        async function initConnection() {
+            const statusDot = document.getElementById('status-dot');
+            const statusTitle = document.getElementById('status-title');
+            const statusDesc = document.getElementById('status-desc');
+            const statusAction = document.getElementById('status-action');
+            const statusBox = document.getElementById('connection-status');
+
+            if (typeof supabaseClient !== 'undefined' && supabaseClient !== null) {
+                try {
+                    const { data, error } = await supabaseClient.from('menu_items').select('id').limit(1);
+                    if (error) throw error;
+
+                    statusDot.className = "w-3 h-3 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]";
+                    statusTitle.innerText = "Conectado ao Supabase";
+                    statusTitle.className = "font-bold text-sm text-green-400";
+                    statusDesc.innerText = "Sincronizado em tempo real com o banco de dados oficial.";
+                    statusBox.className = "mb-8 p-4 rounded-xl border border-green-500/20 bg-green-500/5 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all duration-300";
+                    useDemoMode = false;
+                } catch (e) {
+                    console.error("Erro Supabase:", e);
+                    enableDemoMode("Erro de Conexão: " + e.message);
+                }
+            } else {
+                enableDemoMode("Chaves de acesso não encontradas ou inválidas.");
+            }
+
+            function enableDemoMode(reason) {
+                statusDot.className = "w-3 h-3 rounded-full bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.6)]";
+                statusTitle.innerText = "Modo Demo Local";
+                statusTitle.className = "font-bold text-sm text-yellow-500";
+                statusDesc.innerText = reason + " Os dados serão salvos no navegador.";
+                statusAction.classList.remove('hidden');
+                statusBox.className = "mb-8 p-4 rounded-xl border border-yellow-500/20 bg-yellow-500/5 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all duration-300";
+                useDemoMode = true;
+            }
+        }
+
+        async function fetchData() {
+            if (useDemoMode) {
+                const localItems = localStorage.getItem('boteco_bangu_items');
+                if (localItems) {
+                    allItems = JSON.parse(localItems);
+                } else {
+                    allItems = [...MOCK_DEFAULT_ITEMS];
+                    localStorage.setItem('boteco_bangu_items', JSON.stringify(allItems));
+                }
+                const localConfig = localStorage.getItem('boteco_bangu_config_festivo');
+                configPrecosFestivos = localConfig === 'true';
+            } else {
+                try {
+                    const { data: items, error: itemsError } = await supabaseClient
+                        .from('menu_items')
+                        .select('*')
+                        .order('categoria', { ascending: true })
+                        .order('ordem', { ascending: true });
+
+                    if (itemsError) throw itemsError;
+                    allItems = items || [];
+
+                    const { data: config, error: configError } = await supabaseClient
+                        .from('configuracoes_cardapio')
+                        .select('valor_booleano')
+                        .eq('chave', 'precos_festivos_ativos')
+                        .single();
+
+                    if (configError && configError.code !== 'PGRST116') throw configError;
+                    configPrecosFestivos = config ? config.valor_booleano : false;
+                } catch (e) {
+                    console.error("Erro ao puxar dados do Supabase:", e);
+                    allItems = [];
+                }
+            }
+
+            updateDashboard();
+            populateCategoryDropdowns();
+            renderTable();
+        }
+
+        function updateDashboard() {
+            document.getElementById('stat-total-items').innerText = allItems.length;
+            const categories = new Set(allItems.map(item => item.categoria));
+            document.getElementById('stat-total-categories').innerText = categories.size;
+            updateSwitchUI();
+        }
+
+        function updateSwitchUI() {
+            const btn = document.getElementById('switch-precos-festivos');
+            const icon = document.getElementById('switch-icon');
+            const handle = btn.querySelector('span');
+
+            if (configPrecosFestivos) {
+                btn.className = "w-14 h-8 bg-wine-700 rounded-full relative transition-colors duration-300 focus:outline-none border border-wine-800 shadow-[0_0_8px_rgba(185,28,28,0.4)]";
+                handle.className = "w-6 h-6 bg-white rounded-full absolute top-1 left-7 transition-transform duration-300 shadow-md flex items-center justify-center";
+                icon.className = "fas fa-check text-xs text-wine-700";
+            } else {
+                btn.className = "w-14 h-8 bg-gray-700 rounded-full relative transition-colors duration-300 focus:outline-none border border-gray-600";
+                handle.className = "w-6 h-6 bg-white rounded-full absolute top-1 left-1 transition-transform duration-300 shadow-md flex items-center justify-center";
+                icon.className = "fas fa-times text-xs text-gray-400";
+            }
+        }
+
+        async function togglePrecosFestivos() {
+            configPrecosFestivos = !configPrecosFestivos;
+            updateSwitchUI();
+
+            if (useDemoMode) {
+                localStorage.setItem('boteco_bangu_config_festivo', configPrecosFestivos);
+                showToast("Preços de feriado " + (configPrecosFestivos ? "ativados" : "desativados") + " localmente.");
+            } else {
+                try {
+                    const { error } = await supabaseClient
+                        .from('configuracoes_cardapio')
+                        .upsert({ chave: 'precos_festivos_ativos', valor_booleano: configPrecosFestivos });
+
+                    if (error) throw error;
+                    showToast("Sucesso: Preços de feriados " + (configPrecosFestivos ? "ativados" : "desativados") + " no Supabase.");
+                } catch (e) {
+                    console.error("Erro ao salvar configuração:", e);
+                    configPrecosFestivos = !configPrecosFestivos;
+                    updateSwitchUI();
+                    alert("Erro ao salvar no Supabase: " + e.message);
+                }
+            }
+        }
+
+        let sortableInstance = null;
+
+        function initSortable() {
+            const tbody = document.getElementById('items-table-body');
+            const categoryVal = document.getElementById('category-filter').value;
+            
+            if (sortableInstance) {
+                sortableInstance.destroy();
+                sortableInstance = null;
+            }
+
+            const searchVal = document.getElementById('search-input').value.trim();
+            if (!categoryVal || searchVal !== "") {
+                return;
+            }
+
+            sortableInstance = Sortable.create(tbody, {
+                handle: '.drag-handle',
+                animation: 150,
+                onEnd: async function(evt) {
+                    const rows = tbody.querySelectorAll('tr[data-id]');
+                    const updates = [];
+                    
+                    showToast("Salvando nova ordem...");
+
+                    rows.forEach((row, index) => {
+                        const itemId = parseInt(row.getAttribute('data-id'));
+                        const item = allItems.find(i => i.id === itemId);
+                        if (item) {
+                            item.ordem = index + 1;
+                            updates.push({
+                                id: item.id,
+                                nome: item.nome,
+                                descricao: item.descricao,
+                                preco: item.preco,
+                                categoria: item.categoria,
+                                ordem: item.ordem,
+                                disponivel: item.disponivel,
+                                dias_semana: item.dias_semana,
+                                hora_inicio: item.hora_inicio,
+                                hora_fim: item.hora_fim,
+                                imagem_url: item.imagem_url,
+                                preco_especial: item.preco_especial
+                            });
+                        }
+                    });
+
+                    if (useDemoMode) {
+                        localStorage.setItem('boteco_bangu_items', JSON.stringify(allItems));
+                        showToast("Ordem atualizada localmente!");
+                    } else {
+                        try {
+                            const { error } = await supabaseClient
+                                .from('menu_items')
+                                .upsert(updates);
+                            
+                            if (error) throw error;
+                            showToast("Ordem do cardápio salva com sucesso!");
+                        } catch (e) {
+                            console.error("Erro ao salvar ordem no Supabase:", e);
+                            showToast("Erro ao salvar ordem: " + e.message);
+                        }
+                    }
+                }
+            });
         }
 
         function renderTable() {
-            const list = document.getElementById('items-list');
-            const search = document.getElementById('search-input').value.toLowerCase();
-            const filtered = menuItems.filter(i => i.nome.toLowerCase().includes(search) || i.categoria.toLowerCase().includes(search));
-            list.innerHTML = filtered.map(item => `
-                <tr class="hover:bg-gray-50 border-b border-gray-100">
-                    <td class="p-4"><p class="font-bold text-sm">${item.nome}</p></td>
-                    <td class="p-4"><span class="bg-gray-100 px-2 py-1 rounded-full text-[9px] font-bold">${item.categoria}</span></td>
-                    <td class="p-4 font-bold text-red-800 text-sm">R$ ${item.preco.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
-                    <td class="p-4 text-right flex justify-end gap-2">
-                        <button onclick="editItem(${item.id})" class="w-8 h-8 rounded bg-blue-50 text-blue-600"><i class="fas fa-edit text-xs"></i></button>
-                        <button onclick="deleteItem(${item.id})" class="w-8 h-8 rounded bg-red-50 text-red-600"><i class="fas fa-trash text-xs"></i></button>
-                    </td>
-                </tr>
-            `).join('');
-        }
+            const tbody = document.getElementById('items-table-body');
+            const searchVal = document.getElementById('search-input').value.toLowerCase().trim();
+            const categoryVal = document.getElementById('category-filter').value;
 
-        function openModal(editId = null) {
-            document.getElementById('item-modal').classList.remove('hidden');
-            document.getElementById('item-form').reset();
-            document.getElementById('item-id').value = "";
-            renderCategorySelect();
-            if (editId) {
-                const item = menuItems.find(i => i.id === editId);
-                if (item) {
-                    document.getElementById('item-id').value = item.id;
-                    document.getElementById('item-name').value = item.nome;
-                    document.getElementById('item-price').value = item.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-                    document.getElementById('item-category').value = item.categoria;
-                    document.getElementById('item-description').value = item.descricao;
-                    document.getElementById('item-image').value = item.imagem_url || "";
-                    document.getElementById('item-start').value = item.hora_inicio || "";
-                    document.getElementById('item-end').value = item.hora_fim || "";
-                    document.querySelectorAll('input[name="days"]').forEach(cb => cb.checked = item.dias_semana ? item.dias_semana.includes(parseInt(cb.value)) : false);
-                    document.getElementById('modal-title').innerText = "Editar Prato";
+            // Mostrar/ocultar cabeçalho do arrasto
+            const dragHeader = document.querySelector('.drag-header');
+            const showDrag = categoryVal !== "" && searchVal === "";
+            if (dragHeader) {
+                if (showDrag) {
+                    dragHeader.classList.remove('hidden');
+                } else {
+                    dragHeader.classList.add('hidden');
                 }
             }
+
+            const filtered = allItems.filter(item => {
+                const matchSearch = item.nome.toLowerCase().includes(searchVal) || 
+                                    (item.descricao && item.descricao.toLowerCase().includes(searchVal));
+                const matchCategory = !categoryVal || item.categoria === categoryVal;
+                return matchSearch && matchCategory;
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="p-8 text-center text-gray-500">
+                            <i class="fas fa-search text-2xl mb-2"></i>
+                            <p>Nenhum prato encontrado com os filtros.</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(item => {
+                const precoFormat = Number(item.preco).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                const precoEspecialFormat = item.preco_especial ? Number(item.preco_especial).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : "-";
+                
+                const statusClass = item.disponivel 
+                    ? "bg-green-500/10 text-green-500 border border-green-500/30" 
+                    : "bg-red-500/10 text-red-500 border border-red-500/30";
+                const statusLabel = item.disponivel ? "Disponível" : "Indisponível";
+
+                const descSnippet = item.descricao 
+                    ? `<p class="text-xs text-gray-400 mt-1 max-w-sm line-clamp-1">${item.descricao}</p>` 
+                    : "";
+
+                const imgPlaceholder = item.imagem_url 
+                    ? `<img src="${item.imagem_url}" alt="${item.nome}" class="w-10 h-10 object-cover rounded-lg border border-gray-700 bg-gray-800">`
+                    : `<div class="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center border border-gray-700"><i class="fas fa-utensils text-gray-600 text-xs"></i></div>`;
+
+                return `
+                    <tr data-id="${item.id}" class="hover:bg-darkCard/50 transition-colors">
+                        <td class="p-4 text-center text-gray-500 drag-cell ${showDrag ? '' : 'hidden'} cursor-move drag-handle">
+                            <i class="fas fa-grip-lines hover:text-white transition-colors"></i>
+                        </td>
+                        <td class="p-4 pl-6">${imgPlaceholder}</td>
+                        <td class="p-4">
+                            <h4 class="font-bold text-sm text-white">${item.nome}</h4>
+                            ${descSnippet}
+                        </td>
+                        <td class="p-4">
+                            <span class="text-xs font-semibold px-2.5 py-1 bg-darkInput rounded-lg text-gray-300 border border-gray-800/80">${item.categoria}</span>
+                        </td>
+                        <td class="p-4 text-right font-medium">${precoFormat}</td>
+                        <td class="p-4 text-right text-gold-500 font-semibold">${precoEspecialFormat}</td>
+                        <td class="p-4 text-center">
+                            <span class="text-xs px-2.5 py-0.5 rounded-full font-medium ${statusClass}">${statusLabel}</span>
+                        </td>
+                        <td class="p-4 pr-6">
+                            <div class="flex items-center justify-center gap-2">
+                                <button onclick="duplicateItem(${item.id})" title="Duplicar Prato" class="w-8 h-8 rounded-lg bg-gold-600/10 border border-gold-600/30 text-gold-500 hover:bg-gold-600 hover:text-white transition-all duration-200 flex items-center justify-center">
+                                    <i class="far fa-copy text-sm"></i>
+                                </button>
+                                <button onclick="editItem(${item.id})" title="Editar" class="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/30 text-blue-400 hover:bg-blue-500 hover:text-white transition-all duration-200 flex items-center justify-center">
+                                    <i class="far fa-edit text-sm"></i>
+                                </button>
+                                <button onclick="deleteItem(${item.id})" title="Excluir" class="w-8 h-8 rounded-lg bg-wine-500/10 border border-wine-500/30 text-wine-500 hover:bg-wine-700 hover:text-white transition-all duration-200 flex items-center justify-center">
+                                    <i class="far fa-trash-alt text-sm"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            initSortable();
         }
 
-        function closeModal() { document.getElementById('item-modal').classList.add('hidden'); }
-        function editItem(id) { openModal(id); }
-        async function deleteItem(id) { if(confirm("Excluir?")) { await supabaseClient.from('menu_items').delete().eq('id', id); loadItems(); } }
+        let cropperInstance = null;
+        let selectedFileForCropping = null;
 
-        async function handleSave(e) {
-            e.preventDefault();
-            const id = document.getElementById('item-id').value;
-            const statusDiv = document.getElementById('upload-status');
-            const fileInput = document.getElementById('item-file');
-            
-            const days = Array.from(document.querySelectorAll('input[name="days"]:checked')).map(cb => parseInt(cb.value));
-            const price = parseFloat(document.getElementById('item-price').value.replace(/\D/g, "")) / 100;
-            let imageUrl = document.getElementById('item-image').value;
+        function setupEventListeners() {
+            document.getElementById('switch-precos-festivos').addEventListener('click', togglePrecosFestivos);
+            document.getElementById('search-input').addEventListener('input', renderTable);
+            document.getElementById('category-filter').addEventListener('change', renderTable);
 
-            if (fileInput.files.length > 0) {
-                statusDiv.style.display = 'flex';
-                const file = fileInput.files[0];
-                const fileExt = file.name.split('.').pop();
-                const cleanName = file.name.split('.')[0].toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, '-');
-                const fileName = `${Date.now()}-${cleanName}.${fileExt}`;
-                
-                const { data, error } = await supabaseClient.storage.from('menu-images').upload(`menu/${fileName}`, file);
-                
-                if (error) {
-                    alert("Erro no upload: " + error.message);
-                    statusDiv.style.display = 'none';
+            const openBtn = document.getElementById('btn-add-item');
+            const closeBtn = document.getElementById('btn-close-modal');
+            const cancelBtn = document.getElementById('btn-cancel');
+
+            openBtn.addEventListener('click', () => openModal());
+            closeBtn.addEventListener('click', closeModal);
+            cancelBtn.addEventListener('click', closeModal);
+            document.getElementById('item-form').addEventListener('submit', handleFormSubmit);
+
+            // Toggle visual dos pills de dias da semana
+            document.querySelectorAll('.dia-pill').forEach(label => {
+                label.addEventListener('click', () => {
+                    const cb = label.querySelector('input[type="checkbox"]');
+                    // O clique no label já alterna o checkbox; aguardamos um tick para ler o novo estado
+                    setTimeout(() => label.classList.toggle('dia-pill--active', cb.checked), 0);
+                });
+            });
+
+            // Listeners para o Modal de Categorias
+            document.getElementById('btn-manage-categories').addEventListener('click', openCategoriesModal);
+            document.getElementById('btn-close-categories-modal').addEventListener('click', closeCategoriesModal);
+            document.getElementById('btn-add-category').addEventListener('click', addCategory);
+            document.getElementById('new-category-input').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addCategory();
+                }
+            });
+
+            const fileInput = document.getElementById('form-imagem-file');
+            if (fileInput) {
+                fileInput.addEventListener('change', handleImageUpload);
+            }
+
+            const precoInput = document.getElementById('form-preco');
+            const precoEspecialInput = document.getElementById('form-preco-especial');
+
+            const formatCurrencyInput = (input) => {
+                let value = input.value.replace(/\D/g, "");
+                if (value === "") {
+                    input.value = "";
                     return;
                 }
-                
-                const { data: { publicUrl } } = supabaseClient.storage.from('menu-images').getPublicUrl(`menu/${fileName}`);
-                imageUrl = publicUrl;
-                document.getElementById('item-image').value = imageUrl; // Atualiza o campo visualmente
-                statusDiv.style.display = 'none';
-            }
-
-            const itemData = {
-                nome: document.getElementById('item-name').value,
-                preco: price,
-                categoria: document.getElementById('item-category').value,
-                descricao: document.getElementById('item-description').value,
-                imagem_url: imageUrl,
-                disponivel: true,
-                dias_semana: days.length > 0 ? days : null,
-                hora_inicio: document.getElementById('item-start').value || null,
-                hora_fim: document.getElementById('item-end').value || null
+                let floatValue = parseFloat(value) / 100;
+                input.value = floatValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
             };
 
-            console.log("Salvando dados:", itemData); // Para debug no console
+            if (precoInput) {
+                precoInput.addEventListener('input', function() { formatCurrencyInput(this); });
+            }
+            if (precoEspecialInput) {
+                precoEspecialInput.addEventListener('input', function() { formatCurrencyInput(this); });
+            }
 
-            const { error } = id ? await supabaseClient.from('menu_items').update(itemData).eq('id', id) : await supabaseClient.from('menu_items').insert([itemData]);
-            if (error) {
-                alert("Erro ao salvar: " + error.message);
-            } else {
-                alert("Salvo com sucesso!");
-                closeModal();
-                loadItems();
+            // Listeners do Modal de Recorte
+            const closeCropper = () => {
+                const modal = document.getElementById('cropper-modal');
+                modal.querySelector('.transform').classList.add('scale-95');
+                modal.classList.add('opacity-0');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    if (cropperInstance) {
+                        cropperInstance.destroy();
+                        cropperInstance = null;
+                    }
+                }, 300);
+            };
+
+            document.getElementById('btn-close-cropper').addEventListener('click', closeCropper);
+            document.getElementById('btn-cancel-cropper').addEventListener('click', closeCropper);
+
+            document.getElementById('btn-save-cropper').addEventListener('click', async () => {
+                if (!cropperInstance || !selectedFileForCropping) return;
+
+                const uploadLabel = document.getElementById('upload-label');
+                const uploadIcon = document.getElementById('upload-icon');
+                const uploadStatus = document.getElementById('upload-status');
+                const urlInput = document.getElementById('form-imagem');
+
+                closeCropper();
+
+                try {
+                    uploadLabel.innerText = "Recortando...";
+                    uploadIcon.className = "fas fa-spinner fa-spin text-gold-500";
+                    uploadStatus.innerText = "Enviando imagem recortada...";
+                    uploadStatus.className = "text-xs text-gold-500 animate-pulse";
+
+                    const canvas = cropperInstance.getCroppedCanvas({
+                        imageSmoothingEnabled: true,
+                        imageSmoothingQuality: 'high'
+                    });
+
+                    canvas.toBlob(async (blob) => {
+                        if (!blob) throw new Error("Erro ao gerar imagem recortada.");
+
+                        const fileExt = selectedFileForCropping.name.split('.').pop();
+                        const baseName = selectedFileForCropping.name.substring(0, selectedFileForCropping.name.lastIndexOf('.'));
+                        const cleanName = baseName.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').trim();
+                        const fileName = `${Date.now()}-${cleanName}-cropped.${fileExt}`;
+                        const filePath = `menu/${fileName}`;
+
+                        const { data, error } = await supabaseClient.storage
+                            .from('menu-images')
+                            .upload(filePath, blob, {
+                                cacheControl: '3600',
+                                contentType: selectedFileForCropping.type || 'image/png',
+                                upsert: false
+                            });
+
+                        if (error) {
+                            console.error("Erro no upload do Supabase:", error);
+                            alert("Falha no upload do Supabase: " + error.message);
+                            resetUploadUI();
+                            return;
+                        }
+
+                        const { data: publicUrlData } = supabaseClient.storage
+                            .from('menu-images')
+                            .getPublicUrl(filePath);
+
+                        const publicUrl = publicUrlData.publicUrl;
+
+                        urlInput.value = publicUrl;
+                        
+                        uploadLabel.innerText = "Imagem Enviada";
+                        uploadIcon.className = "fas fa-check-circle text-green-500";
+                        uploadStatus.innerText = "Recorte enviado com sucesso!";
+                        uploadStatus.className = "text-xs text-green-400 font-semibold";
+                        
+                        showToast("Imagem recortada e salva no Supabase com sucesso!");
+                    }, selectedFileForCropping.type || 'image/png', 0.95);
+
+                } catch (err) {
+                    console.error("Erro ao processar recorte:", err);
+                    resetUploadUI();
+                    alert("Erro ao processar imagem: " + err.message);
+                }
+
+                function resetUploadUI() {
+                    uploadLabel.innerText = "Subir Imagem";
+                    uploadIcon.className = "fas fa-cloud-upload-alt text-wine-500";
+                    uploadStatus.innerText = "Falha no processamento.";
+                    uploadStatus.className = "text-xs text-red-500";
+                }
+            });
+        }
+
+        async function handleImageUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            if (useDemoMode) {
+                alert("O upload de imagens está desativado no Modo Demo.");
+                e.target.value = "";
+                return;
+            }
+
+            selectedFileForCropping = file;
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const cropperImage = document.getElementById('cropper-image');
+                cropperImage.src = event.target.result;
+
+                const modal = document.getElementById('cropper-modal');
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    modal.classList.remove('opacity-0');
+                    modal.querySelector('.transform').classList.remove('scale-95');
+
+                    if (cropperInstance) cropperInstance.destroy();
+                    cropperInstance = new Cropper(cropperImage, {
+                        aspectRatio: NaN, // Proporção inteiramente livre para ajuste
+                        viewMode: 1,
+                        autoCropArea: 0.9,
+                        responsive: true,
+                        restore: false,
+                        guides: true,
+                        center: true,
+                        highlight: false,
+                        cropBoxMovable: true,
+                        cropBoxResizable: true,
+                        toggleDragModeOnDblclick: false
+                    });
+                }, 50);
+            };
+            reader.readAsDataURL(file);
+            e.target.value = "";
+        }
+
+        function openModal(title = "Novo Prato") {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('item-form').reset();
+            document.getElementById('form-item-id').value = "";
+            document.getElementById('form-preco').value = "";
+            document.getElementById('form-preco-especial').value = "";
+            document.getElementById('form-ordem').value = allItems.length + 1;
+
+            // Reset dos campos de disponibilidade
+            document.querySelectorAll('input[name="form-dias"]').forEach(cb => cb.checked = false);
+            document.getElementById('form-hora-inicio').value = '';
+            document.getElementById('form-hora-fim').value = '';
+
+            // Reset do estado de upload de imagem
+            document.getElementById('upload-label').innerText = "Subir Imagem";
+            document.getElementById('upload-icon').className = "fas fa-cloud-upload-alt text-wine-500";
+            document.getElementById('upload-status').innerText = "";
+            document.getElementById('upload-status').className = "text-xs text-gray-400";
+
+            const modal = document.getElementById('item-modal');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modal.querySelector('.transform').classList.remove('scale-95');
+            }, 50);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('item-modal');
+            modal.querySelector('.transform').classList.add('scale-95');
+            modal.classList.add('opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        function editItem(id) {
+            const item = allItems.find(i => i.id === id);
+            if (!item) return;
+
+            openModal("Editar Prato: " + item.nome);
+            
+            document.getElementById('form-item-id').value = item.id;
+            document.getElementById('form-nome').value = item.nome;
+            document.getElementById('form-categoria').value = item.categoria;
+            document.getElementById('form-descricao').value = item.descricao || "";
+            
+            const formatValueForInput = (val) => {
+                if (val === null || val === undefined || val === "") return "";
+                return Number(val).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            };
+            document.getElementById('form-preco').value = formatValueForInput(item.preco);
+            document.getElementById('form-preco-especial').value = formatValueForInput(item.preco_especial);
+            
+            document.getElementById('form-imagem').value = item.imagem_url || "";
+            document.getElementById('form-ordem').value = item.ordem || 0;
+            document.getElementById('form-disponivel').checked = item.disponivel === true;
+
+            // Preencher dias da semana
+            document.querySelectorAll('input[name="form-dias"]').forEach(cb => {
+                cb.checked = Array.isArray(item.dias_semana) && item.dias_semana.includes(parseInt(cb.value));
+                cb.closest('label').classList.toggle('dia-pill--active', cb.checked);
+            });
+            // Preencher horários
+            document.getElementById('form-hora-inicio').value = item.hora_inicio ? item.hora_inicio.substring(0, 5) : '';
+            document.getElementById('form-hora-fim').value = item.hora_fim ? item.hora_fim.substring(0, 5) : '';
+
+            // Configura status da imagem atual
+            if (item.imagem_url) {
+                document.getElementById('upload-label').innerText = "Subir Nova Imagem";
+                document.getElementById('upload-status').innerText = "Imagem cadastrada no Supabase";
+                document.getElementById('upload-status').className = "text-xs text-green-400/80";
             }
         }
 
-        document.getElementById('login-form').addEventListener('submit', handleLogin);
-        document.getElementById('item-form').addEventListener('submit', handleSave);
-        checkSession();
+        function duplicateItem(id) {
+            const item = allItems.find(i => i.id === id);
+            if (!item) return;
+
+            openModal("Duplicar Prato: " + item.nome);
+            
+            document.getElementById('form-item-id').value = ""; 
+            document.getElementById('form-nome').value = item.nome + " (Cópia)";
+            document.getElementById('form-categoria').value = item.categoria;
+            document.getElementById('form-descricao').value = item.descricao || "";
+            
+            const formatValueForInput = (val) => {
+                if (val === null || val === undefined || val === "") return "";
+                return Number(val).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            };
+            document.getElementById('form-preco').value = formatValueForInput(item.preco);
+            document.getElementById('form-preco-especial').value = formatValueForInput(item.preco_especial);
+            
+            document.getElementById('form-imagem').value = item.imagem_url || "";
+            document.getElementById('form-ordem').value = allItems.length + 1;
+            document.getElementById('form-disponivel').checked = true;
+
+            // Copiar disponibilidade do original
+            document.querySelectorAll('input[name="form-dias"]').forEach(cb => {
+                cb.checked = Array.isArray(item.dias_semana) && item.dias_semana.includes(parseInt(cb.value));
+                cb.closest('label').classList.toggle('dia-pill--active', cb.checked);
+            });
+            document.getElementById('form-hora-inicio').value = item.hora_inicio ? item.hora_inicio.substring(0, 5) : '';
+            document.getElementById('form-hora-fim').value = item.hora_fim ? item.hora_fim.substring(0, 5) : '';
+
+            // Configura status da imagem atual para cópia
+            if (item.imagem_url) {
+                document.getElementById('upload-label').innerText = "Subir Nova Imagem";
+                document.getElementById('upload-status').innerText = "Imagem copiada do original";
+                document.getElementById('upload-status').className = "text-xs text-gold-400/80";
+            }
+        }
+
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            const idVal = document.getElementById('form-item-id').value;
+            const nome = document.getElementById('form-nome').value.trim();
+            const categoria = document.getElementById('form-categoria').value;
+            const descricao = document.getElementById('form-descricao').value.trim();
+            
+            const parseCurrencyToFloat = (str) => {
+                if (!str) return null;
+                const clean = str.replace(/\D/g, "");
+                if (!clean) return null;
+                return parseFloat(clean) / 100;
+            };
+            const preco = parseCurrencyToFloat(document.getElementById('form-preco').value);
+            const preco_especial = parseCurrencyToFloat(document.getElementById('form-preco-especial').value);
+            
+            const imagem_url = document.getElementById('form-imagem').value.trim();
+            const ordem = parseInt(document.getElementById('form-ordem').value) || 0;
+            const disponivel = document.getElementById('form-disponivel').checked;
+
+            const diasChecked = Array.from(document.querySelectorAll('input[name="form-dias"]:checked')).map(cb => parseInt(cb.value));
+            const dias_semana = diasChecked.length > 0 ? diasChecked : null;
+            const hora_inicio = document.getElementById('form-hora-inicio').value || null;
+            const hora_fim = document.getElementById('form-hora-fim').value || null;
+
+            const itemData = {
+                nome,
+                categoria,
+                descricao: descricao || null,
+                preco,
+                preco_especial,
+                imagem_url: imagem_url || null,
+                ordem,
+                disponivel,
+                dias_semana,
+                hora_inicio,
+                hora_fim
+            };
+
+            if (useDemoMode) {
+                if (idVal) {
+                    const index = allItems.findIndex(i => i.id == idVal);
+                    if (index !== -1) {
+                        allItems[index] = { ...allItems[index], ...itemData };
+                    }
+                } else {
+                    const newId = allItems.length > 0 ? Math.max(...allItems.map(i => i.id)) + 1 : 1;
+                    allItems.push({ id: newId, ...itemData });
+                }
+                localStorage.setItem('boteco_bangu_items', JSON.stringify(allItems));
+                showToast("Cardápio salvo localmente!");
+            } else {
+                try {
+                    if (idVal) {
+                        const { error } = await supabaseClient
+                            .from('menu_items')
+                            .update(itemData)
+                            .eq('id', idVal);
+
+                        if (error) throw error;
+                        showToast(`Prato atualizado com sucesso no Supabase.`);
+                    } else {
+                        const { error } = await supabaseClient
+                            .from('menu_items')
+                            .insert([itemData]);
+
+                        if (error) throw error;
+                        showToast(`Prato inserido com sucesso no Supabase.`);
+                    }
+                } catch (e) {
+                    console.error("Erro ao salvar item:", e);
+                    alert("Erro ao gravar dados no Supabase: " + e.message);
+                    return;
+                }
+            }
+
+            closeModal();
+            await fetchData();
+        }
+
+        async function deleteItem(id) {
+            const item = allItems.find(i => i.id === id);
+            if (!item) return;
+
+            if (!confirm(`Tem certeza que deseja excluir '${item.nome}'?`)) return;
+
+            if (useDemoMode) {
+                allItems = allItems.filter(i => i.id !== id);
+                localStorage.setItem('boteco_bangu_items', JSON.stringify(allItems));
+                showToast("Prato removido localmente!");
+            } else {
+                try {
+                    const { error } = await supabaseClient
+                        .from('menu_items')
+                        .delete()
+                        .eq('id', id);
+
+                    if (error) throw error;
+                    showToast(`Prato removido com sucesso.`);
+                } catch (e) {
+                    console.error("Erro ao remover:", e);
+                    alert("Erro ao excluir do Supabase: " + e.message);
+                    return;
+                }
+            }
+
+            await fetchData();
+        }
+
+        function showToast(message) {
+            const prev = document.querySelector('.toast-container');
+            if (prev) prev.remove();
+
+            const container = document.createElement('div');
+            container.className = "toast-container fixed bottom-6 right-6 z-50 p-4 bg-darkCard border border-wine-800 rounded-xl shadow-2xl flex items-center space-x-3 transition-transform duration-300 translate-y-20";
+            container.innerHTML = `
+                <div class="w-8 h-8 rounded-lg bg-wine-900/50 border border-wine-800 text-gold-500 flex items-center justify-center text-sm shadow">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <div>
+                    <p class="text-sm font-semibold text-white">${message}</p>
+                </div>
+            `;
+
+            document.body.appendChild(container);
+            setTimeout(() => container.classList.remove('translate-y-20'), 10);
+            setTimeout(() => {
+                container.classList.add('translate-y-20');
+                setTimeout(() => container.remove(), 300);
+            }, 3000);
+        }
+    </script>
+    <!-- Modal do Cropper (Recorte de Imagem) -->
+    <div id="cropper-modal" class="fixed inset-0 z-[100] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-darkCard border border-gray-800 w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300">
+            <!-- Header -->
+            <div class="px-6 py-4 border-b border-gray-800 flex justify-between items-center bg-darkBg">
+                <h3 class="font-montserrat font-bold text-base text-white uppercase">Ajustar e Recortar Foto</h3>
+                <button type="button" id="btn-close-cropper" class="text-gray-400 hover:text-white text-xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <!-- Area de Recorte -->
+            <div class="p-6 flex flex-col items-center">
+                <div class="w-full max-h-[350px] overflow-hidden rounded-xl border border-gray-800 bg-black flex justify-center items-center">
+                    <img id="cropper-image" class="max-w-full max-h-[350px] block" style="display: block; max-width: 100%;">
+                </div>
+                <p class="text-xs text-gray-400 mt-3 text-center">Arraste e redimensione a caixa para recortar a foto perfeitamente.</p>
+            </div>
+            <!-- Footer -->
+            <div class="px-6 py-4 border-t border-gray-800 flex justify-end space-x-3 bg-darkBg">
+                <button type="button" id="btn-cancel-cropper" class="px-4 py-2 border border-gray-800 hover:bg-gray-800 text-gray-300 font-bold rounded-lg text-sm transition-colors">
+                    Cancelar
+                </button>
+                <button type="button" id="btn-save-cropper" class="px-5 py-2 bg-wine-700 hover:bg-wine-800 text-white font-bold rounded-lg text-sm transition-colors shadow-lg flex items-center gap-2">
+                    <i class="fas fa-crop-alt"></i> Recortar e Salvar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Gerenciador de Categorias -->
+    <div id="categories-modal" class="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-darkCard border border-gray-800 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300">
+            <!-- Header -->
+            <div class="px-6 py-4 border-b border-gray-800 flex justify-between items-center bg-darkBg">
+                <h3 class="font-montserrat font-bold text-sm text-white uppercase flex items-center gap-2">
+                    <i class="fas fa-tags text-wine-500"></i> Gerenciar Categorias
+                </h3>
+                <button id="btn-close-categories-modal" class="text-gray-400 hover:text-white text-xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <!-- Body -->
+            <div class="p-6 space-y-4 bg-darkCard">
+                <!-- Add New Category Form -->
+                <div class="flex gap-2">
+                    <input type="text" id="new-category-input" placeholder="Nova categoria..." class="flex-1 px-3 py-2 rounded-lg bg-darkInput border border-gray-800 focus:outline-none focus:border-wine-700 text-gray-100 text-sm">
+                    <button id="btn-add-category" class="px-4 py-2 bg-wine-700 hover:bg-wine-800 text-white font-bold rounded-lg text-sm transition-colors flex items-center gap-1">
+                        <i class="fas fa-plus"></i> Add
+                    </button>
+                </div>
+                
+                <!-- Category List -->
+                <div class="max-h-60 overflow-y-auto divide-y divide-gray-800/60 border border-gray-800 rounded-lg p-2 bg-darkBg">
+                    <ul id="categories-list-container" class="space-y-1">
+                        <!-- Categorias dinâmicas -->
+                    </ul>
+                </div>
+
+                <!-- Salvar Ordem -->
+                <div class="flex items-center justify-between pt-2 border-t border-gray-800/60">
+                    <p class="text-[11px] text-gray-500 flex items-center gap-1.5"><i class="fas fa-grip-lines text-gray-600"></i> Arraste as categorias para reordenar</p>
+                    <button id="btn-save-cat-order" onclick="saveCategoryOrder()" class="px-4 py-1.5 bg-wine-700 hover:bg-wine-800 text-white font-bold rounded-lg text-xs transition-colors flex items-center gap-1.5">
+                        <i class="fas fa-save"></i> Salvar Ordem
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openCategoriesModal() {
+            const modal = document.getElementById('categories-modal');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modal.querySelector('div').classList.remove('scale-95');
+            }, 10);
+            renderCategoriesList();
+        }
+
+        function closeCategoriesModal() {
+            const modal = document.getElementById('categories-modal');
+            modal.classList.add('opacity-0');
+            modal.querySelector('div').classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        function renderCategoriesList() {
+            const container = document.getElementById('categories-list-container');
+            if (!container) return;
+
+            const dbCategories = [...new Set(allItems.map(item => item.categoria))].filter(Boolean);
+            const allCategoriesSet = new Set([
+                ...DEFAULT_CATEGORIES,
+                ...dbCategories,
+                ...customCategories
+            ]);
+
+            // Usa a ordem salva, adicionando no final as que ainda não estão nela
+            const savedOrder = (() => {
+                try { return JSON.parse(localStorage.getItem('boteco_bangu_cat_order') || '[]'); } catch { return []; }
+            })();
+            const uniqueCategories = [
+                ...savedOrder.filter(c => allCategoriesSet.has(c)),
+                ...[...allCategoriesSet].filter(c => !savedOrder.includes(c)).sort()
+            ];
+
+            container.innerHTML = '';
+            uniqueCategories.forEach(cat => {
+                const li = document.createElement('li');
+                li.className = "flex items-center justify-between p-2 rounded-lg hover:bg-gray-800/40 transition-colors cursor-grab active:cursor-grabbing";
+                li.setAttribute('data-cat', cat);
+
+                const leftDiv = document.createElement('div');
+                leftDiv.className = "flex items-center gap-2";
+
+                const handleIcon = document.createElement('i');
+                handleIcon.className = "fas fa-grip-lines text-gray-600 cat-drag-handle text-xs";
+                leftDiv.appendChild(handleIcon);
+
+                const nameSpan = document.createElement('span');
+                nameSpan.className = "text-sm text-gray-200 font-medium flex items-center gap-2";
+                nameSpan.textContent = cat;
+
+                const itemCount = allItems.filter(item => item.categoria === cat).length;
+                const countBadge = document.createElement('span');
+                countBadge.className = "text-xs px-2 py-0.5 rounded-full bg-gray-800 text-gray-400";
+                countBadge.textContent = `${itemCount} prato(s)`;
+                nameSpan.appendChild(countBadge);
+                leftDiv.appendChild(nameSpan);
+
+                const actionsDiv = document.createElement('div');
+                actionsDiv.className = "flex items-center gap-2";
+
+                const editBtn = document.createElement('button');
+                editBtn.className = "p-1 text-blue-400 hover:text-blue-300 transition-colors";
+                editBtn.title = "Renomear Categoria";
+                editBtn.innerHTML = '<i class="fas fa-edit"></i>';
+                editBtn.onclick = () => renameCategory(cat);
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = "p-1 text-red-500 hover:text-red-400 transition-colors";
+                deleteBtn.title = "Excluir Categoria";
+                deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
+                deleteBtn.onclick = () => deleteCategory(cat);
+
+                actionsDiv.appendChild(editBtn);
+                actionsDiv.appendChild(deleteBtn);
+
+                li.appendChild(leftDiv);
+                li.appendChild(actionsDiv);
+                container.appendChild(li);
+            });
+
+            // Ativa o Sortable na lista de categorias
+            if (window._catSortable) window._catSortable.destroy();
+            window._catSortable = Sortable.create(container, {
+                handle: '.cat-drag-handle',
+                animation: 150,
+                onEnd: () => {
+                    // Atualiza localStorage imediatamente ao arrastar
+                    const order = [...container.querySelectorAll('li[data-cat]')].map(li => li.getAttribute('data-cat'));
+                    localStorage.setItem('boteco_bangu_cat_order', JSON.stringify(order));
+                }
+            });
+        }
+
+        async function addCategory() {
+            const input = document.getElementById('new-category-input');
+            const catName = input.value.trim();
+            if (!catName) return;
+
+            const dbCategories = [...new Set(allItems.map(item => item.categoria))].filter(Boolean);
+            const allCategoriesSet = new Set([
+                ...DEFAULT_CATEGORIES,
+                ...dbCategories,
+                ...customCategories
+            ]);
+
+            if (allCategoriesSet.has(catName)) {
+                showToast("Esta categoria já existe!");
+                return;
+            }
+
+            customCategories.push(catName);
+            localStorage.setItem('boteco_bangu_custom_categories', JSON.stringify(customCategories));
+            input.value = '';
+            
+            showToast("Categoria adicionada!");
+            renderCategoriesList();
+            populateCategoryDropdowns();
+        }
+
+        async function deleteCategory(catName) {
+            const itemsWithCat = allItems.filter(item => item.categoria === catName);
+            if (itemsWithCat.length > 0) {
+                alert(`Não é possível excluir a categoria "${catName}" porque ela possui ${itemsWithCat.length} pratos ativos. Primeiro altere a categoria desses pratos.`);
+                return;
+            }
+
+            if (!confirm(`Deseja excluir a categoria "${catName}"?`)) return;
+
+            customCategories = customCategories.filter(cat => cat !== catName);
+            localStorage.setItem('boteco_bangu_custom_categories', JSON.stringify(customCategories));
+            
+            showToast("Categoria removida!");
+            renderCategoriesList();
+            populateCategoryDropdowns();
+        }
+
+        async function renameCategory(catName) {
+            const novoNome = prompt(`Digite o novo nome para a categoria "${catName}":`, catName);
+            if (!novoNome || novoNome.trim() === "" || novoNome.trim() === catName) return;
+
+            const novoNomeTrim = novoNome.trim();
+
+            const dbCategories = [...new Set(allItems.map(item => item.categoria))].filter(Boolean);
+            const allCategoriesSet = new Set([
+                ...DEFAULT_CATEGORIES,
+                ...dbCategories,
+                ...customCategories
+            ]);
+
+            if (allCategoriesSet.has(novoNomeTrim) && novoNomeTrim.toLowerCase() !== catName.toLowerCase()) {
+                alert("Já existe uma categoria com este nome!");
+                return;
+            }
+
+            const itemsWithCat = allItems.filter(item => item.categoria === catName);
+            
+            if (itemsWithCat.length > 0) {
+                if (!confirm(`Deseja renomear a categoria de todos os ${itemsWithCat.length} prato(s) associados para "${novoNomeTrim}"?`)) return;
+
+                if (useDemoMode) {
+                    allItems.forEach(item => {
+                        if (item.categoria === catName) item.categoria = novoNomeTrim;
+                    });
+                    localStorage.setItem('boteco_bangu_items', JSON.stringify(allItems));
+                    showToast("Categoria renomeada localmente!");
+                } else {
+                    showToast("Renomeando no Supabase...");
+                    try {
+                        const { error } = await supabaseClient
+                            .from('menu_items')
+                            .update({ categoria: novoNomeTrim })
+                            .eq('categoria', catName);
+
+                        if (error) throw error;
+                        showToast("Categoria renomeada no Supabase!");
+                    } catch (e) {
+                        console.error("Erro ao renomear categoria:", e);
+                        alert("Erro ao salvar no Supabase: " + e.message);
+                        return;
+                    }
+                }
+            }
+
+            if (customCategories.includes(catName)) {
+                customCategories = customCategories.map(cat => cat === catName ? novoNomeTrim : cat);
+                localStorage.setItem('boteco_bangu_custom_categories', JSON.stringify(customCategories));
+            } else if (DEFAULT_CATEGORIES.includes(catName)) {
+                customCategories.push(novoNomeTrim);
+                localStorage.setItem('boteco_bangu_custom_categories', JSON.stringify(customCategories));
+            }
+
+            await fetchData();
+            renderCategoriesList();
+        }
+
+        async function saveCategoryOrder() {
+            const container = document.getElementById('categories-list-container');
+            const order = [...container.querySelectorAll('li[data-cat]')].map(li => li.getAttribute('data-cat'));
+            
+            // Salva no localStorage
+            localStorage.setItem('boteco_bangu_cat_order', JSON.stringify(order));
+            showToast('✅ Ordem das seções salva! (válida neste navegador)');
+
+            // Se Supabase disponível, tenta persistir remotamente
+            if (!useDemoMode && supabaseClient) {
+                try {
+                    // Tenta upsert usando valor_booleano como null + chave dedicada
+                    // Nota: requer coluna 'valor_texto' na tabela configuracoes_cardapio
+                    // Se não existir, o catch garante degradação graciosa
+                    await supabaseClient
+                        .from('configuracoes_cardapio')
+                        .upsert({ chave: 'categoria_ordem', valor_booleano: null });
+                    // Sucesso silencioso — a ordem é mantida só no localStorage por enquanto
+                } catch (e) {
+                    // Falha silenciosa — localStorage já foi salvo com sucesso
+                    console.info('Ordem de categorias salva apenas localmente. Para persistência remota, adicione a coluna valor_texto na tabela configuracoes_cardapio.');
+                }
+            }
+        }
     </script>
 </body>
 </html>

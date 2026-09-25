@@ -81,7 +81,16 @@
     </div>
 
     <main class="py-8 px-4 container mx-auto max-w-4xl">
-        
+        <!-- Banner de Manutenção / Atualização de Preços -->
+        <div class="mb-8 p-5 bg-gold/10 border-2 border-dashed border-gold rounded-2xl flex items-center gap-4 text-gold" data-aos="fade-up">
+            <div class="text-3xl shrink-0"><i class="fas fa-tools"></i></div>
+            <div>
+                <h4 class="font-paytone text-base md:text-lg uppercase tracking-wide">Cardápio em Atualização</h4>
+                <p class="font-montserrat text-xs md:text-sm text-gray-300 mt-1 leading-relaxed">
+                    Estamos atualizando nossos preços e novos pratos para melhor atendê-lo. Algumas informações podem diferir temporariamente dos valores praticados na casa. Agradecemos a compreensão!
+                </p>
+            </div>
+        </div>
 
         <div id="menu-container" class="space-y-12"></div>
     </main>
@@ -112,12 +121,13 @@
         let currentMaster = 'comidas';
         let precosFestivosAtivos = false;
         const BEBIDAS_CATEGORIES = ["Bebidas sem Álcool", "Nossos Drinks", "Cervejas", "Chopps", "Carta de Vinhos", "Vinhos", "Long Neck", "Doses", "Gin", "Whisky", "Vodka", "Doses e Destilados"];
+        let categoryOrder = []; // Ordem das categorias definida no admin
         let scrollObserver = null;
 
         async function init() { AOS.init({ duration: 800, once: true }); await loadMenu(); }
 
         async function loadMenu() {
-            const { data, error } = await supabaseClient.from('menu_items').select('*').eq('disponivel', true).order('preco', { ascending: true });
+            const { data, error } = await supabaseClient.from('menu_items').select('*').eq('disponivel', true).order('ordem', { ascending: true });
             if (!error) allItems = data;
             
             try {
@@ -131,6 +141,20 @@
                 }
             } catch (e) {
                 console.warn("Erro ao buscar configurações de preços festivos:", e);
+            }
+
+            // Carrega a ordem de categorias salva pelo admin
+            try {
+                const { data: catConfig } = await supabaseClient
+                    .from('configuracoes_cardapio')
+                    .select('valor_texto')
+                    .eq('chave', 'categoria_ordem')
+                    .single();
+                if (catConfig && catConfig.valor_texto) {
+                    categoryOrder = JSON.parse(catConfig.valor_texto);
+                }
+            } catch (e) {
+                console.warn("Ordem de categorias não encontrada, usando padrão.", e);
             }
 
             renderMenu();
@@ -165,8 +189,16 @@
                 targetCats = presentCats.filter(c => BEBIDAS_CATEGORIES.includes(c));
             }
 
-            // Ordena categorias dinamicamente pela menor 'ordem' dos pratos dentro de cada uma
+            // Ordena categorias: prioriza a ordem salva pelo admin; usa ordem dos pratos como fallback
             targetCats.sort((a, b) => {
+                const idxA = categoryOrder.indexOf(a);
+                const idxB = categoryOrder.indexOf(b);
+                // Se ambas estiverem na lista salva, usa essa ordem
+                if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+                // Se apenas uma estiver, ela vai na frente
+                if (idxA !== -1) return -1;
+                if (idxB !== -1) return 1;
+                // Fallback: menor ordem dos pratos dentro de cada categoria
                 const minA = Math.min(...allItems.filter(i => i.categoria === a).map(i => i.ordem ?? 9999));
                 const minB = Math.min(...allItems.filter(i => i.categoria === b).map(i => i.ordem ?? 9999));
                 return minA - minB;

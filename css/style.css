@@ -1,8 +1,21 @@
 /* Boteco Bangu - Custom Styles */
 
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Barlow+Condensed:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400;1,700&family=Caveat:wght@400;700&display=swap');
+
+@font-face {
+    font-family: 'Lumios Marker';
+    src: url('../assets/fonts/Lumios-Marker.woff2') format('woff2'),
+         url('../assets/fonts/Lumios-Marker.woff') format('woff'),
+         url('../assets/fonts/Lumios-Marker.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
 :root {
-    --color-wine: #b91c1c;
+    --color-wine: #7b1113;
     --color-gold: #facc15;
+    --color-gold-dark: #ca8a04;
 }
 
 html, body {
@@ -19,6 +32,48 @@ body {
 h1, h2, h3, .font-paytone {
     font-family: 'Paytone One', sans-serif;
     letter-spacing: -0.02em;
+}
+
+.font-barlow {
+    font-family: 'Barlow Condensed', sans-serif;
+}
+
+.font-anton {
+    font-family: 'Anton', sans-serif;
+}
+
+.font-opensans {
+    font-family: 'Open Sans', sans-serif;
+}
+
+.font-chalk-hand {
+    font-family: 'Lumios Marker', 'Caveat', cursive;
+}
+
+/* Textura vermelha de parede/lousa de boteco */
+.bg-boteco-red {
+    background-color: #5c080a;
+    background-image: 
+        radial-gradient(circle at 50% 50%, rgba(139, 0, 0, 0.25), rgba(40, 0, 0, 0.9)),
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.1   0 0 0 0 0   0 0 0 0 0  0 0 0 0.08 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+}
+
+/* Lousa de giz preta/grafite rústica */
+.bg-chalkboard {
+    background-color: #121212;
+    background-image: 
+        radial-gradient(circle at 50% 50%, rgba(30, 30, 30, 0.3), rgba(10, 10, 10, 0.9)),
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 1   0 0 0 0 1   0 0 0 0 1  0 0 0 0.04 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    border: 2px solid #eab308;
+    box-shadow: inset 0 0 25px rgba(0,0,0,0.9), 0 8px 20px rgba(0,0,0,0.6);
+}
+
+.chalk-dots {
+    flex-grow: 1;
+    border-bottom: 2px dotted rgba(250, 204, 21, 0.45);
+    margin: 0 8px;
+    position: relative;
+    top: -4px;
 }
 
 .font-montserrat {
@@ -125,16 +180,14 @@ h1, h2, h3, .font-paytone {
     transform: scale(0.95);
 }
 
-/* Cardápio Specifics */
 .cardapio-bg {
     position: relative;
     min-height: 100vh;
-    background-attachment: fixed;
-    background-size: cover;
-    background-position: center;
+    background-color: #5c080a;
     background-image: 
-        linear-gradient(to bottom, rgba(26, 2, 2, 0.8), rgba(26, 2, 2, 0.9)),
-        url('../assets/img/04.png');
+        radial-gradient(circle at 50% 50%, rgba(139, 0, 0, 0.25), rgba(40, 0, 0, 0.95)),
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.1   0 0 0 0 0   0 0 0 0 0  0 0 0 0.08 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-attachment: fixed;
 }
 
 .cardapio-section {

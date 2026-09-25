@@ -1,14 +1,19 @@
 RewriteEngine On
+RewriteBase /
+
+# 0. Desativar MultiViews para evitar conflitos com o mod_rewrite
+Options -MultiViews
 
 # 1. Redirecionar index.html para a raiz /
-RewriteCond %{THE_REQUEST} /index\.html [NC]
-RewriteRule ^(.*)index\.html$ /$1 [L,R=301]
+RewriteCond %{THE_REQUEST} \s/+(.+/)?index\.html[\s?] [NC]
+RewriteRule ^(.*)index\.html$ /$1 [R=301,L]
 
-# 2. Redirecionar requisições diretas de .html para a versão limpa (SEO)
+# 2. Redirecionar acessos diretos a arquivos .html para a URL limpa sem .html (para SEO)
 RewriteCond %{THE_REQUEST} \s/+(.+)\.html[\s?] [NC]
-RewriteRule ^ /%1 [L,R=301]
+RewriteRule ^ %1 [R=301,L]
 
-# 3. Resolver URLs sem extensão para o arquivo .html correspondente internamente
+# 3. Reescrever internamente URLs sem extensão para o arquivo .html
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteCond %{REQUEST_FILENAME}\.html -f
-RewriteRule ^([^\.]+)$ $1.html [NC,L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{DOCUMENT_ROOT}/$1.html -f
+RewriteRule ^(.*)$ $1.html [L]
