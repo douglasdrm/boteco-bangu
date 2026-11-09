@@ -42,7 +42,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Montserrat:wght@400;700;900&family=Paytone+One&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/firebase-menu.js"></script>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-V54PKFDRCZ"></script>
     <script>
@@ -113,9 +114,6 @@
 
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
     <script>
-        const SUPABASE_URL = "https://dhgfmfcupkysntxphepn.supabase.co"; 
-        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRoZ2ZtZmN1cGt5c250eHBoZXBuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NzUyMTYsImV4cCI6MjA5MjU1MTIxNn0.ahIgwSOq16X4dQBUDvSmiKUVgLl8E835EGRP4Wnxwyg";
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let allItems = [];
         let currentMaster = 'comidas';
@@ -127,34 +125,19 @@
         async function init() { AOS.init({ duration: 800, once: true }); await loadMenu(); }
 
         async function loadMenu() {
-            const { data, error } = await supabaseClient.from('menu_items').select('*').eq('disponivel', true).order('ordem', { ascending: true });
-            if (!error) allItems = data;
-            
             try {
-                const { data: config, error: configError } = await supabaseClient
-                    .from('configuracoes_cardapio')
-                    .select('valor_booleano')
-                    .eq('chave', 'precos_festivos_ativos')
-                    .single();
-                if (!configError && config) {
-                    precosFestivosAtivos = config.valor_booleano;
-                }
-            } catch (e) {
-                console.warn("Erro ao buscar configurações de preços festivos:", e);
-            }
-
-            // Carrega a ordem de categorias salva pelo admin
-            try {
-                const { data: catConfig } = await supabaseClient
-                    .from('configuracoes_cardapio')
-                    .select('valor_texto')
-                    .eq('chave', 'categoria_ordem')
-                    .single();
-                if (catConfig && catConfig.valor_texto) {
-                    categoryOrder = JSON.parse(catConfig.valor_texto);
-                }
-            } catch (e) {
-                console.warn("Ordem de categorias não encontrada, usando padrão.", e);
+                const menu = await connectFirebaseMenu();
+                allItems = (await menu.items(true)).sort((a, b) => a.ordem - b.ordem);
+                const settings = await menu.config('precos_festivos_ativos');
+                precosFestivosAtivos = settings?.valor_booleano === true;
+                const categories = await menu.config('categoria_ordem');
+                if (Array.isArray(categories?.ordem)) categoryOrder = categories.ordem;
+            } catch (error) {
+                console.error('Erro ao carregar cardápio:', error);
+                const message = document.createElement('p');
+                message.className = 'text-center py-8';
+                message.textContent = 'Não foi possível carregar o cardápio. Atualize a página para tentar novamente.';
+                document.querySelector('main')?.prepend(message);
             }
 
             renderMenu();

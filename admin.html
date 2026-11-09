@@ -41,7 +41,6 @@
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Cropper.js CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
     
     <style>
         body {
@@ -112,22 +111,16 @@
         </div>
     </nav>
 
+    <section class="container mx-auto px-4 pt-8">
+        <p id="firebase-admin-status" role="status">Carregando acesso ao painel…</p>
+        <button id="firebase-sign-in" type="button" hidden class="mt-2 underline">Entrar com Google</button>
+        <button id="firebase-sign-out" type="button" hidden class="mt-2 underline">Sair</button>
+    </section>
+
     <!-- Main Content -->
-    <main class="container mx-auto px-4 pt-8">
+    <main id="firebase-admin-content" hidden class="container mx-auto px-4 pt-8">
         
-        <!-- Supabase Connection Status -->
-        <div id="connection-status" class="mb-8 p-4 rounded-xl border flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all duration-300">
-            <div class="flex items-center space-x-3">
-                <div class="w-3 h-3 rounded-full animate-pulse" id="status-dot"></div>
-                <div>
-                    <h3 class="font-bold text-sm" id="status-title">Conectando...</h3>
-                    <p class="text-xs text-gray-400" id="status-desc">Verificando chaves de acesso ao Supabase...</p>
-                </div>
-            </div>
-            <div id="status-action" class="hidden">
-                <span class="text-xs px-3 py-1 bg-yellow-500/10 text-yellow-500 border border-yellow-500/30 rounded-full font-medium">Modo Demo Ativo (LocalStorage)</span>
-            </div>
-        </div>
+
 
         <!-- Dashboard Stats & Switch Especial -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
@@ -327,24 +320,10 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <!-- Imagem URL / Upload -->
                     <div class="md:col-span-2 space-y-1">
-                        <div class="flex justify-between items-center">
-                            <label class="text-xs font-semibold text-gray-400 uppercase">Imagem do Prato</label>
-                            <span id="upload-status" class="text-xs text-gray-400"></span>
-                        </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                            <!-- Input para Upload Direto -->
-                            <div class="relative">
-                                <input type="file" id="form-imagem-file" accept="image/*" class="hidden">
-                                <label for="form-imagem-file" class="w-full h-[38px] px-3 bg-darkInput border border-gray-800 hover:border-wine-700 rounded-lg text-sm text-gray-300 flex items-center justify-center gap-2 cursor-pointer transition-colors">
-                                    <i class="fas fa-cloud-upload-alt text-wine-500" id="upload-icon"></i>
-                                    <span id="upload-label">Subir Imagem</span>
-                                </label>
-                            </div>
-                            <!-- Campo de URL original -->
-                            <input type="url" id="form-imagem" placeholder="Ou cole a URL da imagem..." class="w-full px-3 py-2 rounded-lg bg-darkInput border border-gray-800 focus:outline-none focus:border-wine-700 text-gray-100 text-sm">
-                        </div>
+                        <label for="form-imagem" class="text-xs font-semibold text-gray-400 uppercase">Foto do prato (opcional)</label>
+                        <input type="text" id="form-imagem" placeholder="/assets/img/menu/foto.webp ou URL https://" class="w-full px-3 py-2 rounded-lg bg-darkInput border border-gray-800 focus:outline-none focus:border-wine-700 text-gray-100 text-sm">
+                        <p class="text-xs text-gray-400">Para trocar a foto, informe o caminho de uma imagem já publicada ou um link HTTPS.</p>
                     </div>
 
                     <!-- Disponível / Ordem -->
@@ -412,33 +391,11 @@
 
     <!-- Scripts -->
     <!-- Cropper.js JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/firebase-menu.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-    <script>
-        // Configuração direta do Supabase para evitar erros de arquivo externo ausente em produção
-        const SUPABASE_URL = "https://dhgfmfcupkysntxphepn.supabase.co";
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRoZ2ZtZmN1cGt5c250eHBoZXBuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NzUyMTYsImV4cCI6MjA5MjU1MTIxNn0.ahIgwSOq16X4dQBUDvSmiKUVgLl8E835EGRP4Wnxwyg";
-
-        let supabaseClient = null;
-
-        if (typeof supabase !== 'undefined') {
-            if (SUPABASE_URL !== "" && SUPABASE_ANON_KEY !== "") {
-                supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            } else {
-                console.warn("Supabase: Por favor, insira as credenciais de URL e Anon Key corretas.");
-            }
-        } else {
-            console.error("Supabase: A biblioteca do Supabase não foi carregada no documento HTML.");
-        }
-    </script>
-
     <!-- Admin Interactive Logic -->
     <script>
-        const MOCK_DEFAULT_ITEMS = [
-            { id: 1, nome: "Carne de Sol com Aipim", descricao: "Carne de sol acebolada grelhada com aipim frito na manteiga de garrafa.", preco: 89.90, preco_especial: 99.90, categoria: "Pratos para Compartilhar", ordem: 1, disponivel: true, imagem_url: "" }
-        ];
-
         const DEFAULT_CATEGORIES = [
             "Pratos Executivos",
             "Petiscos",
@@ -454,14 +411,39 @@
         ];
         let customCategories = JSON.parse(localStorage.getItem('boteco_bangu_custom_categories') || '[]');
 
-        let useDemoMode = false;
+        let menu;
         let allItems = [];
         let configPrecosFestivos = false;
 
         document.addEventListener('DOMContentLoaded', async () => {
-            await initConnection();
-            await fetchData();
-            setupEventListeners();
+            const status = document.getElementById('firebase-admin-status');
+            const panel = document.getElementById('firebase-admin-content');
+            const signIn = document.getElementById('firebase-sign-in');
+            const signOut = document.getElementById('firebase-sign-out');
+            const showError = error => { status.textContent = error.message; };
+            try {
+                menu = await connectFirebaseMenu();
+                setupEventListeners();
+                const auth = await menu.adminAuth(async (user, allowed) => {
+                    panel.hidden = true;
+                    signIn.hidden = !!user;
+                    signOut.hidden = !user;
+                    if (!allowed) {
+                        closeModal();
+                        closeCategoriesModal();
+                        allItems = [];
+                        status.textContent = user ? 'Esta conta não tem acesso ao painel.' : 'Entre para editar o cardápio.';
+                        return;
+                    }
+                    status.textContent = '';
+                    await fetchData();
+                    panel.hidden = false;
+                }, showError);
+                signIn.onclick = () => auth.signIn().catch(showError);
+                signOut.onclick = () => auth.signOut().catch(showError);
+            } catch (error) {
+                showError(error);
+            }
         });
 
         function populateCategoryDropdowns() {
@@ -500,77 +482,19 @@
             }
         }
 
-        async function initConnection() {
-            const statusDot = document.getElementById('status-dot');
-            const statusTitle = document.getElementById('status-title');
-            const statusDesc = document.getElementById('status-desc');
-            const statusAction = document.getElementById('status-action');
-            const statusBox = document.getElementById('connection-status');
-
-            if (typeof supabaseClient !== 'undefined' && supabaseClient !== null) {
-                try {
-                    const { data, error } = await supabaseClient.from('menu_items').select('id').limit(1);
-                    if (error) throw error;
-
-                    statusDot.className = "w-3 h-3 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]";
-                    statusTitle.innerText = "Conectado ao Supabase";
-                    statusTitle.className = "font-bold text-sm text-green-400";
-                    statusDesc.innerText = "Sincronizado em tempo real com o banco de dados oficial.";
-                    statusBox.className = "mb-8 p-4 rounded-xl border border-green-500/20 bg-green-500/5 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all duration-300";
-                    useDemoMode = false;
-                } catch (e) {
-                    console.error("Erro Supabase:", e);
-                    enableDemoMode("Erro de Conexão: " + e.message);
-                }
-            } else {
-                enableDemoMode("Chaves de acesso não encontradas ou inválidas.");
-            }
-
-            function enableDemoMode(reason) {
-                statusDot.className = "w-3 h-3 rounded-full bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.6)]";
-                statusTitle.innerText = "Modo Demo Local";
-                statusTitle.className = "font-bold text-sm text-yellow-500";
-                statusDesc.innerText = reason + " Os dados serão salvos no navegador.";
-                statusAction.classList.remove('hidden');
-                statusBox.className = "mb-8 p-4 rounded-xl border border-yellow-500/20 bg-yellow-500/5 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all duration-300";
-                useDemoMode = true;
-            }
-        }
-
         async function fetchData() {
-            if (useDemoMode) {
-                const localItems = localStorage.getItem('boteco_bangu_items');
-                if (localItems) {
-                    allItems = JSON.parse(localItems);
-                } else {
-                    allItems = [...MOCK_DEFAULT_ITEMS];
-                    localStorage.setItem('boteco_bangu_items', JSON.stringify(allItems));
+            try {
+                allItems = (await menu.items()).sort((a, b) =>
+                    a.categoria.localeCompare(b.categoria) || (a.ordem ?? 0) - (b.ordem ?? 0));
+                const config = await menu.config('precos_festivos_ativos');
+                configPrecosFestivos = config?.valor_booleano === true;
+                const categoryConfig = await menu.config('categoria_ordem');
+                if (Array.isArray(categoryConfig?.ordem)) {
+                    localStorage.setItem('boteco_bangu_cat_order', JSON.stringify(categoryConfig.ordem));
                 }
-                const localConfig = localStorage.getItem('boteco_bangu_config_festivo');
-                configPrecosFestivos = localConfig === 'true';
-            } else {
-                try {
-                    const { data: items, error: itemsError } = await supabaseClient
-                        .from('menu_items')
-                        .select('*')
-                        .order('categoria', { ascending: true })
-                        .order('ordem', { ascending: true });
-
-                    if (itemsError) throw itemsError;
-                    allItems = items || [];
-
-                    const { data: config, error: configError } = await supabaseClient
-                        .from('configuracoes_cardapio')
-                        .select('valor_booleano')
-                        .eq('chave', 'precos_festivos_ativos')
-                        .single();
-
-                    if (configError && configError.code !== 'PGRST116') throw configError;
-                    configPrecosFestivos = config ? config.valor_booleano : false;
-                } catch (e) {
-                    console.error("Erro ao puxar dados do Supabase:", e);
-                    allItems = [];
-                }
+            } catch (e) {
+                console.error("Erro ao puxar dados do Firebase:", e);
+                allItems = [];
             }
 
             updateDashboard();
@@ -605,23 +529,14 @@
             configPrecosFestivos = !configPrecosFestivos;
             updateSwitchUI();
 
-            if (useDemoMode) {
-                localStorage.setItem('boteco_bangu_config_festivo', configPrecosFestivos);
-                showToast("Preços de feriado " + (configPrecosFestivos ? "ativados" : "desativados") + " localmente.");
-            } else {
-                try {
-                    const { error } = await supabaseClient
-                        .from('configuracoes_cardapio')
-                        .upsert({ chave: 'precos_festivos_ativos', valor_booleano: configPrecosFestivos });
-
-                    if (error) throw error;
-                    showToast("Sucesso: Preços de feriados " + (configPrecosFestivos ? "ativados" : "desativados") + " no Supabase.");
-                } catch (e) {
-                    console.error("Erro ao salvar configuração:", e);
-                    configPrecosFestivos = !configPrecosFestivos;
-                    updateSwitchUI();
-                    alert("Erro ao salvar no Supabase: " + e.message);
-                }
+            try {
+                await menu.setConfig('precos_festivos_ativos', { valor_booleano: configPrecosFestivos });
+                showToast("Sucesso: Preços de feriados " + (configPrecosFestivos ? "ativados" : "desativados") + " no Firebase.");
+            } catch (e) {
+                console.error("Erro ao salvar configuração:", e);
+                configPrecosFestivos = !configPrecosFestivos;
+                updateSwitchUI();
+                alert("Erro ao salvar no Firebase: " + e.message);
             }
         }
 
@@ -672,21 +587,12 @@
                         }
                     });
 
-                    if (useDemoMode) {
-                        localStorage.setItem('boteco_bangu_items', JSON.stringify(allItems));
-                        showToast("Ordem atualizada localmente!");
-                    } else {
-                        try {
-                            const { error } = await supabaseClient
-                                .from('menu_items')
-                                .upsert(updates);
-                            
-                            if (error) throw error;
-                            showToast("Ordem do cardápio salva com sucesso!");
-                        } catch (e) {
-                            console.error("Erro ao salvar ordem no Supabase:", e);
-                            showToast("Erro ao salvar ordem: " + e.message);
-                        }
+                    try {
+                        await menu.updateItems(updates.map(({ id, ordem }) => ({ id, ordem })));
+                        showToast("Ordem do cardápio salva com sucesso!");
+                    } catch (e) {
+                        console.error("Erro ao salvar ordem no Firebase:", e);
+                        showToast("Erro ao salvar ordem: " + e.message);
                     }
                 }
             });
@@ -782,8 +688,6 @@
             initSortable();
         }
 
-        let cropperInstance = null;
-        let selectedFileForCropping = null;
 
         function setupEventListeners() {
             document.getElementById('switch-precos-festivos').addEventListener('click', togglePrecosFestivos);
@@ -819,11 +723,6 @@
                 }
             });
 
-            const fileInput = document.getElementById('form-imagem-file');
-            if (fileInput) {
-                fileInput.addEventListener('change', handleImageUpload);
-            }
-
             const precoInput = document.getElementById('form-preco');
             const precoEspecialInput = document.getElementById('form-preco-especial');
 
@@ -844,140 +743,6 @@
                 precoEspecialInput.addEventListener('input', function() { formatCurrencyInput(this); });
             }
 
-            // Listeners do Modal de Recorte
-            const closeCropper = () => {
-                const modal = document.getElementById('cropper-modal');
-                modal.querySelector('.transform').classList.add('scale-95');
-                modal.classList.add('opacity-0');
-                setTimeout(() => {
-                    modal.classList.add('hidden');
-                    if (cropperInstance) {
-                        cropperInstance.destroy();
-                        cropperInstance = null;
-                    }
-                }, 300);
-            };
-
-            document.getElementById('btn-close-cropper').addEventListener('click', closeCropper);
-            document.getElementById('btn-cancel-cropper').addEventListener('click', closeCropper);
-
-            document.getElementById('btn-save-cropper').addEventListener('click', async () => {
-                if (!cropperInstance || !selectedFileForCropping) return;
-
-                const uploadLabel = document.getElementById('upload-label');
-                const uploadIcon = document.getElementById('upload-icon');
-                const uploadStatus = document.getElementById('upload-status');
-                const urlInput = document.getElementById('form-imagem');
-
-                closeCropper();
-
-                try {
-                    uploadLabel.innerText = "Recortando...";
-                    uploadIcon.className = "fas fa-spinner fa-spin text-gold-500";
-                    uploadStatus.innerText = "Enviando imagem recortada...";
-                    uploadStatus.className = "text-xs text-gold-500 animate-pulse";
-
-                    const canvas = cropperInstance.getCroppedCanvas({
-                        imageSmoothingEnabled: true,
-                        imageSmoothingQuality: 'high'
-                    });
-
-                    canvas.toBlob(async (blob) => {
-                        if (!blob) throw new Error("Erro ao gerar imagem recortada.");
-
-                        const fileExt = selectedFileForCropping.name.split('.').pop();
-                        const baseName = selectedFileForCropping.name.substring(0, selectedFileForCropping.name.lastIndexOf('.'));
-                        const cleanName = baseName.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').trim();
-                        const fileName = `${Date.now()}-${cleanName}-cropped.${fileExt}`;
-                        const filePath = `menu/${fileName}`;
-
-                        const { data, error } = await supabaseClient.storage
-                            .from('menu-images')
-                            .upload(filePath, blob, {
-                                cacheControl: '3600',
-                                contentType: selectedFileForCropping.type || 'image/png',
-                                upsert: false
-                            });
-
-                        if (error) {
-                            console.error("Erro no upload do Supabase:", error);
-                            alert("Falha no upload do Supabase: " + error.message);
-                            resetUploadUI();
-                            return;
-                        }
-
-                        const { data: publicUrlData } = supabaseClient.storage
-                            .from('menu-images')
-                            .getPublicUrl(filePath);
-
-                        const publicUrl = publicUrlData.publicUrl;
-
-                        urlInput.value = publicUrl;
-                        
-                        uploadLabel.innerText = "Imagem Enviada";
-                        uploadIcon.className = "fas fa-check-circle text-green-500";
-                        uploadStatus.innerText = "Recorte enviado com sucesso!";
-                        uploadStatus.className = "text-xs text-green-400 font-semibold";
-                        
-                        showToast("Imagem recortada e salva no Supabase com sucesso!");
-                    }, selectedFileForCropping.type || 'image/png', 0.95);
-
-                } catch (err) {
-                    console.error("Erro ao processar recorte:", err);
-                    resetUploadUI();
-                    alert("Erro ao processar imagem: " + err.message);
-                }
-
-                function resetUploadUI() {
-                    uploadLabel.innerText = "Subir Imagem";
-                    uploadIcon.className = "fas fa-cloud-upload-alt text-wine-500";
-                    uploadStatus.innerText = "Falha no processamento.";
-                    uploadStatus.className = "text-xs text-red-500";
-                }
-            });
-        }
-
-        async function handleImageUpload(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            if (useDemoMode) {
-                alert("O upload de imagens está desativado no Modo Demo.");
-                e.target.value = "";
-                return;
-            }
-
-            selectedFileForCropping = file;
-
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                const cropperImage = document.getElementById('cropper-image');
-                cropperImage.src = event.target.result;
-
-                const modal = document.getElementById('cropper-modal');
-                modal.classList.remove('hidden');
-                setTimeout(() => {
-                    modal.classList.remove('opacity-0');
-                    modal.querySelector('.transform').classList.remove('scale-95');
-
-                    if (cropperInstance) cropperInstance.destroy();
-                    cropperInstance = new Cropper(cropperImage, {
-                        aspectRatio: NaN, // Proporção inteiramente livre para ajuste
-                        viewMode: 1,
-                        autoCropArea: 0.9,
-                        responsive: true,
-                        restore: false,
-                        guides: true,
-                        center: true,
-                        highlight: false,
-                        cropBoxMovable: true,
-                        cropBoxResizable: true,
-                        toggleDragModeOnDblclick: false
-                    });
-                }, 50);
-            };
-            reader.readAsDataURL(file);
-            e.target.value = "";
         }
 
         function openModal(title = "Novo Prato") {
@@ -993,11 +758,6 @@
             document.getElementById('form-hora-inicio').value = '';
             document.getElementById('form-hora-fim').value = '';
 
-            // Reset do estado de upload de imagem
-            document.getElementById('upload-label').innerText = "Subir Imagem";
-            document.getElementById('upload-icon').className = "fas fa-cloud-upload-alt text-wine-500";
-            document.getElementById('upload-status').innerText = "";
-            document.getElementById('upload-status').className = "text-xs text-gray-400";
 
             const modal = document.getElementById('item-modal');
             modal.classList.remove('hidden');
@@ -1048,11 +808,6 @@
             document.getElementById('form-hora-fim').value = item.hora_fim ? item.hora_fim.substring(0, 5) : '';
 
             // Configura status da imagem atual
-            if (item.imagem_url) {
-                document.getElementById('upload-label').innerText = "Subir Nova Imagem";
-                document.getElementById('upload-status').innerText = "Imagem cadastrada no Supabase";
-                document.getElementById('upload-status').className = "text-xs text-green-400/80";
-            }
         }
 
         function duplicateItem(id) {
@@ -1086,11 +841,6 @@
             document.getElementById('form-hora-fim').value = item.hora_fim ? item.hora_fim.substring(0, 5) : '';
 
             // Configura status da imagem atual para cópia
-            if (item.imagem_url) {
-                document.getElementById('upload-label').innerText = "Subir Nova Imagem";
-                document.getElementById('upload-status').innerText = "Imagem copiada do original";
-                document.getElementById('upload-status').className = "text-xs text-gold-400/80";
-            }
         }
 
         async function handleFormSubmit(e) {
@@ -1111,6 +861,12 @@
             const preco_especial = parseCurrencyToFloat(document.getElementById('form-preco-especial').value);
             
             const imagem_url = document.getElementById('form-imagem').value.trim();
+            if (imagem_url && !/^https:\/\/[^\s]+$/i.test(imagem_url)
+                && !/^\/assets\/img\/[^\s]+$/.test(imagem_url)
+                && imagem_url !== allItems.find(item => item.id == idVal)?.imagem_url) {
+                alert('Informe uma URL HTTPS ou um caminho dentro de /assets/img/.');
+                return;
+            }
             const ordem = parseInt(document.getElementById('form-ordem').value) || 0;
             const disponivel = document.getElementById('form-disponivel').checked;
 
@@ -1133,41 +889,18 @@
                 hora_fim
             };
 
-            if (useDemoMode) {
+            try {
                 if (idVal) {
-                    const index = allItems.findIndex(i => i.id == idVal);
-                    if (index !== -1) {
-                        allItems[index] = { ...allItems[index], ...itemData };
-                    }
+                    await menu.update(idVal, itemData);
+                    showToast(`Prato atualizado com sucesso no Firebase.`);
                 } else {
-                    const newId = allItems.length > 0 ? Math.max(...allItems.map(i => i.id)) + 1 : 1;
-                    allItems.push({ id: newId, ...itemData });
+                    await menu.insert(itemData);
+                    showToast(`Prato inserido com sucesso no Firebase.`);
                 }
-                localStorage.setItem('boteco_bangu_items', JSON.stringify(allItems));
-                showToast("Cardápio salvo localmente!");
-            } else {
-                try {
-                    if (idVal) {
-                        const { error } = await supabaseClient
-                            .from('menu_items')
-                            .update(itemData)
-                            .eq('id', idVal);
-
-                        if (error) throw error;
-                        showToast(`Prato atualizado com sucesso no Supabase.`);
-                    } else {
-                        const { error } = await supabaseClient
-                            .from('menu_items')
-                            .insert([itemData]);
-
-                        if (error) throw error;
-                        showToast(`Prato inserido com sucesso no Supabase.`);
-                    }
-                } catch (e) {
-                    console.error("Erro ao salvar item:", e);
-                    alert("Erro ao gravar dados no Supabase: " + e.message);
-                    return;
-                }
+            } catch (e) {
+                console.error("Erro ao salvar item:", e);
+                alert("Erro ao gravar dados no Firebase: " + e.message);
+                return;
             }
 
             closeModal();
@@ -1180,24 +913,13 @@
 
             if (!confirm(`Tem certeza que deseja excluir '${item.nome}'?`)) return;
 
-            if (useDemoMode) {
-                allItems = allItems.filter(i => i.id !== id);
-                localStorage.setItem('boteco_bangu_items', JSON.stringify(allItems));
-                showToast("Prato removido localmente!");
-            } else {
-                try {
-                    const { error } = await supabaseClient
-                        .from('menu_items')
-                        .delete()
-                        .eq('id', id);
-
-                    if (error) throw error;
-                    showToast(`Prato removido com sucesso.`);
-                } catch (e) {
-                    console.error("Erro ao remover:", e);
-                    alert("Erro ao excluir do Supabase: " + e.message);
-                    return;
-                }
+            try {
+                await menu.remove(id);
+                showToast(`Prato removido com sucesso.`);
+            } catch (e) {
+                console.error("Erro ao remover:", e);
+                alert("Erro ao excluir do Firebase: " + e.message);
+                return;
             }
 
             await fetchData();
@@ -1226,35 +948,6 @@
             }, 3000);
         }
     </script>
-    <!-- Modal do Cropper (Recorte de Imagem) -->
-    <div id="cropper-modal" class="fixed inset-0 z-[100] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
-        <div class="bg-darkCard border border-gray-800 w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300">
-            <!-- Header -->
-            <div class="px-6 py-4 border-b border-gray-800 flex justify-between items-center bg-darkBg">
-                <h3 class="font-montserrat font-bold text-base text-white uppercase">Ajustar e Recortar Foto</h3>
-                <button type="button" id="btn-close-cropper" class="text-gray-400 hover:text-white text-xl">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <!-- Area de Recorte -->
-            <div class="p-6 flex flex-col items-center">
-                <div class="w-full max-h-[350px] overflow-hidden rounded-xl border border-gray-800 bg-black flex justify-center items-center">
-                    <img id="cropper-image" class="max-w-full max-h-[350px] block" style="display: block; max-width: 100%;">
-                </div>
-                <p class="text-xs text-gray-400 mt-3 text-center">Arraste e redimensione a caixa para recortar a foto perfeitamente.</p>
-            </div>
-            <!-- Footer -->
-            <div class="px-6 py-4 border-t border-gray-800 flex justify-end space-x-3 bg-darkBg">
-                <button type="button" id="btn-cancel-cropper" class="px-4 py-2 border border-gray-800 hover:bg-gray-800 text-gray-300 font-bold rounded-lg text-sm transition-colors">
-                    Cancelar
-                </button>
-                <button type="button" id="btn-save-cropper" class="px-5 py-2 bg-wine-700 hover:bg-wine-800 text-white font-bold rounded-lg text-sm transition-colors shadow-lg flex items-center gap-2">
-                    <i class="fas fa-crop-alt"></i> Recortar e Salvar
-                </button>
-            </div>
-        </div>
-    </div>
-
     <!-- Modal Gerenciador de Categorias -->
     <div id="categories-modal" class="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
         <div class="bg-darkCard border border-gray-800 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300">
@@ -1462,27 +1155,14 @@
             if (itemsWithCat.length > 0) {
                 if (!confirm(`Deseja renomear a categoria de todos os ${itemsWithCat.length} prato(s) associados para "${novoNomeTrim}"?`)) return;
 
-                if (useDemoMode) {
-                    allItems.forEach(item => {
-                        if (item.categoria === catName) item.categoria = novoNomeTrim;
-                    });
-                    localStorage.setItem('boteco_bangu_items', JSON.stringify(allItems));
-                    showToast("Categoria renomeada localmente!");
-                } else {
-                    showToast("Renomeando no Supabase...");
-                    try {
-                        const { error } = await supabaseClient
-                            .from('menu_items')
-                            .update({ categoria: novoNomeTrim })
-                            .eq('categoria', catName);
-
-                        if (error) throw error;
-                        showToast("Categoria renomeada no Supabase!");
-                    } catch (e) {
-                        console.error("Erro ao renomear categoria:", e);
-                        alert("Erro ao salvar no Supabase: " + e.message);
-                        return;
-                    }
+                showToast("Renomeando no Firebase...");
+                try {
+                    await menu.updateItems(itemsWithCat.map(({ id }) => ({ id, categoria: novoNomeTrim })));
+                    showToast("Categoria renomeada no Firebase!");
+                } catch (e) {
+                    console.error("Erro ao renomear categoria:", e);
+                    alert("Erro ao salvar no Firebase: " + e.message);
+                    return;
                 }
             }
 
@@ -1502,24 +1182,12 @@
             const container = document.getElementById('categories-list-container');
             const order = [...container.querySelectorAll('li[data-cat]')].map(li => li.getAttribute('data-cat'));
             
-            // Salva no localStorage
-            localStorage.setItem('boteco_bangu_cat_order', JSON.stringify(order));
-            showToast('✅ Ordem das seções salva! (válida neste navegador)');
-
-            // Se Supabase disponível, tenta persistir remotamente
-            if (!useDemoMode && supabaseClient) {
-                try {
-                    // Tenta upsert usando valor_booleano como null + chave dedicada
-                    // Nota: requer coluna 'valor_texto' na tabela configuracoes_cardapio
-                    // Se não existir, o catch garante degradação graciosa
-                    await supabaseClient
-                        .from('configuracoes_cardapio')
-                        .upsert({ chave: 'categoria_ordem', valor_booleano: null });
-                    // Sucesso silencioso — a ordem é mantida só no localStorage por enquanto
-                } catch (e) {
-                    // Falha silenciosa — localStorage já foi salvo com sucesso
-                    console.info('Ordem de categorias salva apenas localmente. Para persistência remota, adicione a coluna valor_texto na tabela configuracoes_cardapio.');
-                }
+            try {
+                await menu.setConfig('categoria_ordem', { ordem: order });
+                localStorage.setItem('boteco_bangu_cat_order', JSON.stringify(order));
+                showToast('Ordem das seções salva!');
+            } catch (error) {
+                alert('Não foi possível salvar a ordem: ' + error.message);
             }
         }
     </script>
