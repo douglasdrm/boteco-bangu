@@ -299,6 +299,11 @@
                     </div>
                 </div>
 
+                <div class="space-y-1">
+                    <label for="form-rendimento" class="text-xs font-semibold text-gray-400 uppercase">Unidade ou rendimento (opcional)</label>
+                    <input type="text" id="form-rendimento" maxlength="60" placeholder="Ex.: Unidade, Serve 2 pessoas, 500 ml" class="w-full px-3 py-2 rounded-lg bg-darkInput border border-gray-800 focus:outline-none focus:border-wine-700 text-gray-100 text-sm">
+                </div>
+
                 <!-- Descrição -->
                 <div class="space-y-1">
                     <label for="form-descricao" class="text-xs font-semibold text-gray-400 uppercase">Descrição do Prato</label>
@@ -712,7 +717,7 @@
                         </td>
                         <td class="p-4 pl-6">${imgPlaceholder}</td>
                         <td class="p-4">
-                            <h4 class="font-bold text-sm text-white">${item.nome}</h4>
+                            <h4 class="font-bold text-sm text-white">${item.nome} ${item.rendimento ? `<span class="text-xs font-normal text-gray-400">${escapeLabel(item.rendimento)}</span>` : ''} </h4>
                             ${descSnippet}
                         </td>
                         <td class="p-4">
@@ -878,6 +883,7 @@
             document.getElementById('form-categoria').value = item.categoria;
             document.getElementById('form-descricao').value = item.descricao || "";
             
+            document.getElementById('form-rendimento').value = item.rendimento ?? '';
             loadItemPrices(item);
 
             document.getElementById('form-imagem').value = item.imagem_url || "";
@@ -907,6 +913,7 @@
             document.getElementById('form-categoria').value = item.categoria;
             document.getElementById('form-descricao').value = item.descricao || "";
             
+            document.getElementById('form-rendimento').value = item.rendimento ?? '';
             loadItemPrices(item);
 
             document.getElementById('form-imagem').value = item.imagem_url || "";
@@ -970,6 +977,7 @@
 
             const itemData = {
                 nome,
+                rendimento: document.getElementById('form-rendimento').value.trim() || null,
                 categoria,
                 descricao: descricao || null,
                 preco,

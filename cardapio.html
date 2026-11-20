@@ -45,6 +45,7 @@
         .menu-item-row { border-bottom: 1px solid #79413b; }
         .menu-item-name { font-size: 1.1875rem; font-family: Antonio, sans-serif; font-weight: 600; line-height: 1.23; }
         .menu-item-name button { text-transform: uppercase; }
+        .menu-item-serving { margin-inline-start: .4em; color: #e6c5c2; font-family: Inter, sans-serif; font-size: .75rem; font-weight: 400; text-transform: none; }
         .menu-item-description { font-size: .875rem; line-height: 1.45; }
         .menu-variation, .menu-item-price { font-size: 1rem; line-height: 1.4; }
         .menu-item-price { font-variant-numeric: tabular-nums; }
@@ -185,6 +186,13 @@
             })[character]);
         }
 
+        function menuItemHeading(item) {
+            const legacyUnit = /\s*\(\s*un\.?\s*\)\s*$/i;
+            const label = item.rendimento?.trim() || (legacyUnit.test(item.nome) ? 'Unidade' : '');
+            const name = item.nome.replace(legacyUnit, '');
+            return escapeMenuText(name) + (label ? `<span class="menu-item-serving">${escapeMenuText(label)}</span>` : '');
+        }
+
         function menuPrice(option) {
             const price = precosFestivosAtivos ? option.preco_especial ?? option.preco : option.preco;
             return Number(price).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -275,7 +283,7 @@
                                     <div class="min-w-0 flex-1">
                                         <div class="flex items-start justify-between gap-3">
                                             <h3 class="menu-item-name min-w-0 break-words text-white">
-                                                <button type="button" data-item-id="${escapeMenuText(item.id)}" class="text-left after:absolute after:inset-0">${escapeMenuText(item.nome)}</button>
+                                                <button type="button" data-item-id="${escapeMenuText(item.id)}" class="text-left after:absolute after:inset-0">${menuItemHeading(item)}</button>
                                             </h3>
                                             ${variationPrices ? '' : `<span class="menu-item-price text-gold font-bold whitespace-nowrap shrink-0">${menuPrice(item)}</span>`}
                                         </div>
@@ -309,7 +317,7 @@
                 imgContainer.style.display = 'none';
             }
 
-            document.getElementById('modal-title').innerText = item.nome;
+            document.getElementById('modal-title').innerHTML = menuItemHeading(item);
             const prices = document.getElementById('modal-price');
             const variationPrices = renderMenuPrices(item);
             if (variationPrices) prices.innerHTML = variationPrices;
