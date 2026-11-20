@@ -147,6 +147,30 @@
             if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.pageYOffset - 240, behavior: 'smooth' });
         }
 
+        function menuPrice(option) {
+            const price = precosFestivosAtivos ? option.preco_especial ?? option.preco : option.preco;
+            return Number(price).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+
+        function renderMenuPrices(item) {
+            if (!Array.isArray(item.variacoes) || !item.variacoes.length) return '';
+            const prices = document.createElement('dl');
+            prices.className = 'mt-3 space-y-1.5';
+            for (const option of item.variacoes) {
+                const row = document.createElement('div');
+                row.className = 'flex items-baseline justify-between gap-2 text-xs';
+                const label = document.createElement('dt');
+                label.className = 'min-w-0 break-words text-white';
+                label.textContent = option.nome;
+                const price = document.createElement('dd');
+                price.className = 'shrink-0 whitespace-nowrap font-bold text-gold';
+                price.textContent = menuPrice(option);
+                row.append(label, price);
+                prices.append(row);
+            }
+            return prices.outerHTML;
+        }
+
         function renderMenu() {
             const container = document.getElementById('menu-container');
             const shortcutContainer = document.getElementById('shortcut-container');
@@ -206,17 +230,17 @@
                     <h2 class="text-lg font-paytone text-gold uppercase border-b border-gold/20 pb-1 mb-6 inline-block">${g.name}</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2">
                         ${g.items.map(item => {
-                            const precoFinal = (precosFestivosAtivos && item.preco_especial) ? item.preco_especial : item.preco;
-                            const precoFormatado = precoFinal.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+                            const variationPrices = renderMenuPrices(item);
                             return `
                                 <div onclick="openDetail(${item.id})" class="menu-item-card flex bg-white/5 rounded-2xl overflow-hidden border ${item.isNow ? 'border-white/5' : 'border-red-900/40'} mb-4 ${item.isNow ? '' : 'item-unavailable'} relative">
                                     ${item.imagem_url ? `<div class="w-24 md:w-28 h-24 md:h-28 p-1 overflow-hidden shrink-0 flex items-center justify-center bg-white/5"><img src="${item.imagem_url}" class="w-full h-full object-contain"></div>` : ''}
                                     <div class="p-4 flex-1 flex flex-col justify-center min-w-0">
                                         <div class="flex justify-between items-start gap-4">
                                             <h3 class="text-white font-bold text-[0.75rem] uppercase font-montserrat leading-tight">${item.nome}</h3>
-                                            <div class="text-gold font-bold text-[0.75rem] whitespace-nowrap shrink-0">R$ ${precoFormatado}</div>
+                                            ${variationPrices ? '' : `<div class="text-gold font-bold text-[0.75rem] whitespace-nowrap shrink-0">${menuPrice(item)}</div>`}
                                         </div>
                                         <p class="text-gray-400 text-[0.65rem] mt-1 leading-snug">${item.descricao || ''}</p>
+                                        ${variationPrices}
                                         ${item.scheduleLabel ? `<span class="badge-schedule mt-2"><i class="fas fa-clock" style="font-size:0.45rem"></i>${item.scheduleLabel}</span>` : ''}
                                         ${!item.isNow ? '<p class="text-[8px] text-red-400 font-bold uppercase mt-1 tracking-wider">&#9679; Indisponível agora</p>' : ''}
                                     </div>
@@ -245,10 +269,11 @@
                 imgContainer.style.display = 'none';
             }
 
-            const precoFinal = (precosFestivosAtivos && item.preco_especial) ? item.preco_especial : item.preco;
-
             document.getElementById('modal-title').innerText = item.nome;
-            document.getElementById('modal-price').innerText = 'R$ ' + precoFinal.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+            const prices = document.getElementById('modal-price');
+            const variationPrices = renderMenuPrices(item);
+            if (variationPrices) prices.innerHTML = variationPrices;
+            else prices.textContent = menuPrice(item);
             document.getElementById('modal-desc').innerText = item.descricao || '';
             
             const badge = document.getElementById('modal-badge-container');
