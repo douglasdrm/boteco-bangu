@@ -676,10 +676,22 @@
             }
 
             tbody.innerHTML = filtered.map(item => {
-                const prices = item.variacoes?.length ? item.variacoes : [item];
-                const precoFormat = prices.map(option => formatItemPrice(option.preco)).join('<br>');
-                const precoEspecialFormat = prices.map(option => formatItemPrice(option.preco_especial) || '–').join('<br>');
-                
+                const variations = Array.isArray(item.variacoes) ? item.variacoes : [];
+                const escapeLabel = value => String(value ?? '').replace(/[&<>]/g, char =>
+                    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[char]);
+                const priceCells = variations.length ? `
+                    <td colspan="2" class="p-4">
+                        <div class="grid grid-cols-[minmax(0,1fr)_auto_auto] items-baseline gap-x-3 gap-y-1 text-sm">
+                            ${variations.map(option => `
+                                <span class="text-gray-300 break-words">${escapeLabel(option.nome)}</span>
+                                <span class="text-right whitespace-nowrap font-medium" aria-label="Preço padrão ${formatItemPrice(option.preco)}">${formatItemPrice(option.preco)}</span>
+                                <span class="text-right whitespace-nowrap text-gold-500 font-semibold min-w-[5.5rem]" aria-label="Preço feriado ${formatItemPrice(option.preco_especial) || 'sem valor próprio'}">${formatItemPrice(option.preco_especial) || '–'}</span>
+                            `).join('')}
+                        </div>
+                    </td>` : `
+                    <td class="p-4 text-right font-medium whitespace-nowrap">${formatItemPrice(item.preco)}</td>
+                    <td class="p-4 text-right text-gold-500 font-semibold whitespace-nowrap">${formatItemPrice(item.preco_especial) || '–'}</td>`;
+
                 const statusClass = item.disponivel 
                     ? "bg-green-500/10 text-green-500 border border-green-500/30" 
                     : "bg-red-500/10 text-red-500 border border-red-500/30";
@@ -706,8 +718,7 @@
                         <td class="p-4">
                             <span class="text-xs font-semibold px-2.5 py-1 bg-darkInput rounded-lg text-gray-300 border border-gray-800/80">${item.categoria}</span>
                         </td>
-                        <td class="p-4 text-right font-medium">${precoFormat}</td>
-                        <td class="p-4 text-right text-gold-500 font-semibold">${precoEspecialFormat}</td>
+                        ${priceCells}
                         <td class="p-4 text-center">
                             <span class="text-xs px-2.5 py-0.5 rounded-full font-medium ${statusClass}">${statusLabel}</span>
                         </td>
