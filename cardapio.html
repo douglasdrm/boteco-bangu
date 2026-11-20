@@ -19,20 +19,41 @@
     </script>
 
     <style>
-        .cardapio-bg { background-color: #4a0404; background-image: linear-gradient(rgba(74, 4, 4, 0.94), rgba(74, 4, 4, 0.94)), url('assets/img/04.png'); background-attachment: fixed; background-size: cover; }
-        .master-btn { background: rgba(255, 255, 255, 0.05); color: rgba(255, 255, 255, 0.4); border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.3s ease; }
-        .master-btn.active { background-color: #facc15 !important; color: #4a0404 !important; border-color: #facc15; box-shadow: 0 10px 20px -5px rgba(250, 204, 21, 0.4); }
-        
-        .shortcut-pill { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); color: rgba(255, 255, 255, 0.5); white-space: nowrap; font-size: 0.65rem; padding: 8px 16px; border-radius: 999px; transition: all 0.3s; font-weight: bold; text-transform: uppercase; }
-        .shortcut-pill.active { background: rgba(250, 204, 21, 0.1); border-color: #facc15; color: #facc15; }
+        :root { --logo-bar: 4.5rem; --menu-bg: #3b0607; --menu-gold: #facc15; }
+        .cardapio-bg { background: var(--menu-bg); }
+        .logo-bar { position: sticky; top: 0; z-index: 60; height: var(--logo-bar); background: #7b1113; }
+        .menu-hero {
+            background: linear-gradient(90deg, rgba(23, 3, 2, .76), rgba(23, 3, 2, .28)), url('assets/img/04.png') center 48% / cover;
+            display: flex;
+            align-items: center;
+            min-height: 9rem;
+            padding: 1.5rem clamp(1.25rem, 5.5vw, 5rem);
+        }
+        .menu-hero h1 { font-size: clamp(2.2rem, 7vw, 4.35rem); line-height: 1; }
+        .menu-nav { position: sticky; top: var(--logo-bar); z-index: 50; background: var(--menu-bg); }
+        .master-btn, .shortcut-pill {
+            color: #e1babb;
+            background: #501113;
+            border: 1px solid #833638;
+            transition: background-color .2s, color .2s, border-color .2s;
+        }
+        .master-btn.active { background: var(--menu-gold); border-color: var(--menu-gold); color: var(--menu-bg); }
+        .shortcut-pill { flex: none; white-space: nowrap; font-size: .75rem; padding: .55rem .9rem; border-radius: 999px; font-weight: 700; text-transform: uppercase; }
+        .shortcut-pill.active { background: var(--menu-bg); border-color: var(--menu-gold); color: var(--menu-gold); }
+        #shortcut-container { scrollbar-width: thin; scrollbar-color: #833638 transparent; }
+        .menu-heading { font-size: clamp(1.6rem, 3.6vw, 2.8rem); line-height: 1.12; }
+        .menu-item-row { border-bottom: 1px solid #79413b; }
+        .menu-item-row:hover { background-color: rgba(255,255,255,.035); }
+        .menu-item-row:focus-within, .master-btn:focus-visible, .shortcut-pill:focus-visible { outline: 2px solid var(--menu-gold); outline-offset: -2px; }
+        .menu-variation + .menu-variation { border-top: 1px solid #713433; }
+        .item-unavailable { opacity: .68; }
+        .badge-schedule { color: var(--menu-gold); border: 1px solid #835d28; font-size: .65rem; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; font-weight: 700; display: inline-flex; align-items: center; gap: 5px; }
 
-        .menu-item-card { transition: all 0.2s ease; cursor: pointer; }
-        .menu-item-card:active { transform: scale(0.98); }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .item-unavailable { opacity: 0.4; filter: grayscale(0.8); }
-        
-        .badge-schedule { background: rgba(250, 204, 21, 0.1); color: #facc15; border: 1px solid rgba(250, 204, 21, 0.2); font-size: 0.5rem; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; font-weight: 800; display: inline-flex; align-items: center; gap: 3px; }
+        @media (min-width: 768px) {
+            :root { --logo-bar: 5rem; }
+            .menu-hero { justify-content: center; min-height: 9.5rem; text-align: center; }
+            .menu-heading { width: fit-content; }
+        }
 
         @keyframes modalShow { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
         .modal-content { animation: modalShow 0.3s ease; }
@@ -57,44 +78,38 @@
 
 <body class="text-gray-100 cardapio-bg min-h-screen font-inter pb-20">
 
-    <nav class="fixed top-0 left-0 w-full z-[100] py-4 bg-red-900/95 shadow-lg border-b border-white/5">
-        <div class="container mx-auto px-4 flex justify-between items-center max-w-full">
-            <a href="/"><img src="assets/img/Logo_logo-site.png" alt="Logo" class="h-10 md:h-14"></a>
-            <button id="menu-btn" class="md:hidden text-white text-2xl"><i class="fas fa-bars"></i></button>
-        </div>
+    <nav id="logo-bar" class="logo-bar flex items-center px-5 md:px-8" aria-label="Boteco Bangu">
+        <a href="/"><img src="assets/img/Logo_logo-site.png" alt="Boteco Bangu" class="h-14 md:h-[4.25rem]"></a>
     </nav>
 
-    <header class="pt-32 pb-6 text-center px-4">
-        <h1 class="text-4xl md:text-5xl font-paytone mb-1 uppercase text-gold">Nosso Cardápio</h1>
+    <header class="menu-hero">
+        <h1 class="font-paytone uppercase text-gold max-w-[9ch] md:max-w-none">Nosso Cardápio</h1>
     </header>
 
-    <!-- Sticky Header ajustado para não sobrepor -->
-    <div class="sticky top-[72px] md:top-[88px] z-50 bg-deep-red/95 backdrop-blur-xl border-y border-white/10 shadow-2xl pb-4">
-        <div class="container mx-auto px-4 pt-4 pb-2 flex justify-center gap-3">
-            <button onclick="setMasterFilter('comidas')" id="btn-comidas" class="master-btn active flex-1 md:flex-none md:w-56 py-3.5 rounded-2xl font-bold uppercase text-[0.7rem] flex items-center justify-center gap-2">
-                <i class="fas fa-ututensils"></i> COMIDAS
+    <nav id="menu-nav" class="menu-nav pt-3 pb-2" aria-label="Navegação do cardápio">
+        <div class="mx-auto px-5 flex gap-2 max-w-2xl">
+            <button type="button" onclick="setMasterFilter('comidas')" id="btn-comidas" aria-pressed="true" class="master-btn active flex-1 py-3 rounded-2xl font-bold uppercase text-sm md:text-base">
+                Comidas
             </button>
-            <button onclick="setMasterFilter('bebidas')" id="btn-bebidas" class="master-btn flex-1 md:flex-none md:w-56 py-3.5 rounded-2xl font-bold uppercase text-[0.7rem] flex items-center justify-center gap-2">
-                <i class="fas fa-glass-cheers"></i> BEBIDAS
+            <button type="button" onclick="setMasterFilter('bebidas')" id="btn-bebidas" aria-pressed="false" class="master-btn flex-1 py-3 rounded-2xl font-bold uppercase text-sm md:text-base">
+                <i class="fas fa-glass-cheers mr-1" aria-hidden="true"></i> Bebidas
             </button>
         </div>
-        <div id="shortcut-container" class="container mx-auto px-4 pt-2 overflow-x-auto no-scrollbar flex gap-2 justify-start md:justify-center"></div>
-    </div>
+        <div id="shortcut-container" class="mx-auto max-w-7xl px-5 mt-2 pt-1 pb-2 overflow-x-auto flex gap-2 md:flex-wrap md:justify-center"></div>
+    </nav>
 
-    <main class="py-8 px-4 container mx-auto max-w-4xl">
-        
-
-        <div id="menu-container" class="space-y-12"></div>
+    <main class="mx-auto max-w-[90rem] py-5 md:py-7 px-5 md:px-[6%]">
+        <div id="menu-container" class="space-y-10"></div>
     </main>
 
     <!-- Modal Detalhes -->
     <div id="detail-modal" class="fixed inset-0 z-[110] bg-black/90 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="modal-content glass w-full max-w-lg rounded-3xl overflow-hidden relative">
+        <div class="modal-content glass w-full max-w-lg max-h-full rounded-3xl overflow-y-auto relative">
             <button onclick="closeDetail()" class="absolute top-4 right-4 z-20 bg-black/50 text-white w-10 h-10 rounded-full flex items-center justify-center"><i class="fas fa-times text-xl"></i></button>
             <div id="modal-image-container" class="w-full h-64 md:h-80 p-4 overflow-hidden bg-white/5"><img id="modal-img" src="" class="w-full h-full object-contain"></div>
             <div class="p-8">
                 <div id="modal-badge-container" class="mb-4"></div>
-                <div class="flex justify-between items-start gap-4 mb-4">
+                <div class="space-y-2 mb-4 pr-5">
                     <h2 id="modal-title" class="text-2xl font-paytone text-gold uppercase"></h2>
                     <div id="modal-price" class="text-2xl font-bold text-white font-montserrat"></div>
                 </div>
@@ -111,9 +126,9 @@
         let currentMaster = 'comidas';
         let precosFestivosAtivos = false;
         const BEBIDAS_CATEGORIES = ["Bebidas sem Álcool", "Nossos Drinks", "Cervejas", "Chopps", "Carta de Vinhos", "Vinhos", "Long Neck", "Doses", "Gin", "Whisky", "Vodka", "Doses e Destilados"];
-        let scrollObserver = null;
+        let activeCategory;
 
-        async function init() { AOS.init({ duration: 800, once: true }); await loadMenu(); }
+        async function init() { window.AOS?.init({ duration: 800, once: true }); await loadMenu(); }
 
         async function loadMenu() {
             try {
@@ -136,15 +151,32 @@
 
         function setMasterFilter(type) {
             currentMaster = type;
-            document.querySelectorAll('.master-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(`btn-${type}`).classList.add('active');
+            document.querySelectorAll('.master-btn').forEach(button => {
+                const selected = button.id === `btn-${type}`;
+                button.classList.toggle('active', selected);
+                button.setAttribute('aria-pressed', String(selected));
+            });
             renderMenu();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            const logoBar = document.getElementById('logo-bar');
+            const nav = document.getElementById('menu-nav');
+            if (nav.getBoundingClientRect().top <= logoBar.offsetHeight) {
+                const first = document.querySelector('.menu-section');
+                if (first) scrollToSection(first.id);
+            }
         }
 
         function scrollToSection(id) {
-            const el = document.getElementById(id);
-            if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.pageYOffset - 240, behavior: 'smooth' });
+            const section = document.getElementById(id);
+            if (!section) return;
+            const offset = document.getElementById('logo-bar').offsetHeight +
+                document.getElementById('menu-nav').offsetHeight + 8;
+            window.scrollTo({ top: section.getBoundingClientRect().top + window.scrollY - offset, behavior: 'smooth' });
+        }
+
+        function escapeMenuText(value) {
+            return String(value ?? '').replace(/[&<>"']/g, character => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            })[character]);
         }
 
         function menuPrice(option) {
@@ -155,10 +187,10 @@
         function renderMenuPrices(item) {
             if (!Array.isArray(item.variacoes) || !item.variacoes.length) return '';
             const prices = document.createElement('dl');
-            prices.className = 'mt-3 space-y-1.5';
+            prices.className = 'mt-2';
             for (const option of item.variacoes) {
                 const row = document.createElement('div');
-                row.className = 'flex items-baseline justify-between gap-2 text-xs';
+                row.className = 'menu-variation flex items-baseline justify-between gap-3 py-1.5 text-sm md:text-base';
                 const label = document.createElement('dt');
                 label.className = 'min-w-0 break-words text-white';
                 label.textContent = option.nome;
@@ -198,7 +230,7 @@
 
             const DIAS_NOMES = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
-            const groups = targetCats.map(cat => {
+            const groups = targetCats.map((cat, index) => {
                 const items = allItems.filter(i => i.categoria === cat).map(i => {
                     let av = true;
                     if (i.dias_semana && !i.dias_semana.includes(day)) av = false;
@@ -220,38 +252,40 @@
 
                     return { ...i, isNow: av, scheduleLabel };
                 });
-                return { name: cat, id: 'sec-' + cat.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/ /g, '-'), items };
+                return { name: cat, id: `sec-${currentMaster}-${index}`, items };
             }).filter(g => g.items.length > 0);
 
-            shortcutContainer.innerHTML = groups.map(g => `<button id="pill-${g.id}" onclick="scrollToSection('${g.id}')" class="shortcut-pill">${g.name}</button>`).join('');
+            shortcutContainer.innerHTML = groups.map(g => `<button type="button" id="pill-${g.id}" onclick="scrollToSection('${g.id}')" class="shortcut-pill">${escapeMenuText(g.name)}</button>`).join('');
 
             container.innerHTML = groups.map(g => `
-                <section id="${g.id}" class="menu-section space-y-6">
-                    <h2 class="text-lg font-paytone text-gold uppercase border-b border-gold/20 pb-1 mb-6 inline-block">${g.name}</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2">
+                <section id="${g.id}" class="menu-section">
+                    <h2 class="menu-heading font-paytone text-gold uppercase border-b-2 border-gold pb-2 mb-1 md:mb-2">${escapeMenuText(g.name)}</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-[6%]">
                         ${g.items.map(item => {
                             const variationPrices = renderMenuPrices(item);
                             return `
-                                <div onclick="openDetail(${item.id})" class="menu-item-card flex bg-white/5 rounded-2xl overflow-hidden border ${item.isNow ? 'border-white/5' : 'border-red-900/40'} mb-4 ${item.isNow ? '' : 'item-unavailable'} relative">
-                                    ${item.imagem_url ? `<div class="w-24 md:w-28 h-24 md:h-28 p-1 overflow-hidden shrink-0 flex items-center justify-center bg-white/5"><img src="${item.imagem_url}" class="w-full h-full object-contain"></div>` : ''}
-                                    <div class="p-4 flex-1 flex flex-col justify-center min-w-0">
-                                        <div class="flex justify-between items-start gap-4">
-                                            <h3 class="text-white font-bold text-[0.75rem] uppercase font-montserrat leading-tight">${item.nome}</h3>
-                                            ${variationPrices ? '' : `<div class="text-gold font-bold text-[0.75rem] whitespace-nowrap shrink-0">${menuPrice(item)}</div>`}
+                                <article class="menu-item-row relative flex items-start gap-3 py-4 md:py-5 ${item.isNow ? '' : 'item-unavailable'}">
+                                    ${item.imagem_url ? `<img src="${escapeMenuText(item.imagem_url)}" alt="" loading="lazy" class="h-14 w-14 md:h-16 md:w-16 shrink-0 rounded object-cover">` : ''}
+                                    <div class="min-w-0 flex-1">
+                                        <div class="flex items-start justify-between gap-3">
+                                            <h3 class="min-w-0 break-words text-white font-montserrat font-bold uppercase text-sm md:text-lg leading-tight">
+                                                <button type="button" data-item-id="${escapeMenuText(item.id)}" class="text-left after:absolute after:inset-0">${escapeMenuText(item.nome)}</button>
+                                            </h3>
+                                            ${variationPrices ? '' : `<span class="text-gold font-bold text-sm md:text-base whitespace-nowrap shrink-0">${menuPrice(item)}</span>`}
                                         </div>
-                                        <p class="text-gray-400 text-[0.65rem] mt-1 leading-snug">${item.descricao || ''}</p>
+                                        ${item.descricao ? `<p class="text-[#e6c5c2] text-sm mt-1.5 leading-snug">${escapeMenuText(item.descricao)}</p>` : ''}
                                         ${variationPrices}
-                                        ${item.scheduleLabel ? `<span class="badge-schedule mt-2"><i class="fas fa-clock" style="font-size:0.45rem"></i>${item.scheduleLabel}</span>` : ''}
-                                        ${!item.isNow ? '<p class="text-[8px] text-red-400 font-bold uppercase mt-1 tracking-wider">&#9679; Indisponível agora</p>' : ''}
+                                        ${item.scheduleLabel ? `<span class="badge-schedule mt-2"><i class="fas fa-clock" aria-hidden="true"></i>${escapeMenuText(item.scheduleLabel)}</span>` : ''}
+                                        ${!item.isNow ? '<p class="text-xs text-red-300 font-bold mt-1">Indisponível agora</p>' : ''}
                                     </div>
-                                </div>
+                                </article>
                             `;
                         }).join('')}
                     </div>
                 </section>
             `).join('');
-            
-            setTimeout(setupScrollHighlight, 100);
+            activeCategory = undefined;
+            updateCategoryHighlight();
         }
 
         // Modal Logic
@@ -285,23 +319,32 @@
 
         function closeDetail() { document.getElementById('detail-modal').classList.add('hidden'); document.body.style.overflow = 'auto'; }
 
-        function setupScrollHighlight() {
-            if (scrollObserver) scrollObserver.disconnect();
-            const options = { rootMargin: '-280px 0px -40% 0px', threshold: 0 };
-            scrollObserver = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        document.querySelectorAll('.shortcut-pill').forEach(p => p.classList.remove('active'));
-                        const pill = document.getElementById('pill-' + entry.target.id);
-                        if (pill) {
-                            pill.classList.add('active');
-                            pill.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-                        }
-                    }
-                });
-            }, options);
-            document.querySelectorAll('.menu-section').forEach(s => scrollObserver.observe(s));
+        function updateCategoryHighlight() {
+            const sections = [...document.querySelectorAll('.menu-section')];
+            if (!sections.length) return;
+            const boundary = document.getElementById('menu-nav').getBoundingClientRect().bottom + 12;
+            const current = sections.filter(section => section.getBoundingClientRect().top <= boundary).at(-1) ?? sections[0];
+            if (current.id === activeCategory) return;
+            const previous = document.getElementById('pill-' + activeCategory);
+            previous?.classList.remove('active');
+            previous?.removeAttribute('aria-current');
+            activeCategory = current.id;
+            const pill = document.getElementById('pill-' + current.id);
+            pill.classList.add('active');
+            pill.setAttribute('aria-current', 'true');
+            const rail = document.getElementById('shortcut-container');
+            if (rail.scrollWidth > rail.clientWidth) {
+                rail.scrollBy({ left: pill.getBoundingClientRect().left - rail.getBoundingClientRect().left -
+                    (rail.clientWidth - pill.offsetWidth) / 2, behavior: 'smooth' });
+            }
         }
+
+        window.addEventListener('scroll', updateCategoryHighlight, { passive: true });
+        window.addEventListener('resize', updateCategoryHighlight);
+        document.getElementById('menu-container').addEventListener('click', event => {
+            const itemButton = event.target.closest('[data-item-id]');
+            if (itemButton) openDetail(Number(itemButton.dataset.itemId));
+        });
 
         init();
     </script>
