@@ -424,7 +424,10 @@
 
         function categoryNames() {
             const assigned = allItems.map(item => item.categoria).filter(Boolean);
-            const custom = categorySettings.personalizadas ?? localCategoryList('boteco_bangu_custom_categories');
+            const custom = [
+                ...(categorySettings.personalizadas ?? []),
+                ...localCategoryList('boteco_bangu_custom_categories')
+            ];
             const excluded = new Set(categorySettings.excluidas ?? []);
             const names = new Set([
                 ...[...DEFAULT_CATEGORIES, ...custom].filter(name => !excluded.has(name)),
@@ -969,7 +972,7 @@
     </script>
     <!-- Modal Gerenciador de Categorias -->
     <div id="categories-modal" class="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-3 sm:p-6 hidden opacity-0 transition-opacity duration-300">
-        <div role="dialog" aria-modal="true" aria-labelledby="categories-title" class="bg-darkCard border border-gray-800 w-full max-w-4xl max-h-full flex flex-col rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300">
+        <div role="dialog" aria-modal="true" aria-labelledby="categories-title" class="bg-darkCard border border-gray-800 w-full max-w-4xl h-[min(44rem,100%)] flex flex-col rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300">
             <div class="shrink-0 px-4 sm:px-6 py-4 border-b border-gray-800 flex justify-between items-center bg-darkBg">
                 <h3 id="categories-title" class="font-montserrat font-bold text-sm sm:text-base text-white uppercase flex items-center gap-2">
                     <i class="fas fa-tags text-wine-500" aria-hidden="true"></i> Gerenciar categorias
@@ -979,7 +982,7 @@
                 </button>
             </div>
 
-            <fieldset id="category-controls" class="min-w-0 min-h-0 flex flex-col gap-3 p-3 sm:p-6">
+            <div id="category-controls" class="min-w-0 min-h-0 flex-1 grid grid-rows-[auto_minmax(0,1fr)_auto] gap-3 p-3 sm:p-6">
                 <div class="shrink-0 flex gap-2">
                     <input type="text" id="new-category-input" aria-label="Nova categoria" placeholder="Nova categoria" class="min-w-0 flex-1 px-3 py-2 rounded-lg bg-darkInput border border-gray-800 focus:outline-none focus:border-wine-700 text-gray-100 text-sm">
                     <button id="btn-add-category" type="button" class="px-3 sm:px-4 py-2 bg-wine-700 hover:bg-wine-800 text-white font-bold rounded-lg text-sm">
@@ -987,17 +990,17 @@
                     </button>
                 </div>
 
-                <div class="min-h-0 overflow-y-auto overscroll-contain border border-gray-800 rounded-lg bg-darkBg">
+                <div class="min-h-0 overflow-y-auto overscroll-contain border border-gray-800 rounded-lg bg-darkBg [scrollbar-gutter:stable]">
                     <ul id="categories-list-container" class="divide-y divide-gray-800"></ul>
                 </div>
 
                 <div class="shrink-0 flex flex-wrap items-center justify-between gap-2">
-                    <p class="text-xs text-gray-400">Arraste pela alça ou use as setas.</p>
+                    <p class="text-xs text-gray-400"><span id="category-count"></span> · A ordem vale dentro de Comidas e Bebidas no cardápio.</p>
                     <button id="btn-save-cat-order" type="button" onclick="saveCategoryOrder()" class="ml-auto px-4 py-2 bg-wine-700 hover:bg-wine-800 text-white font-bold rounded-lg text-sm disabled:opacity-50">
                         Salvar ordem
                     </button>
                 </div>
-            </fieldset>
+            </div>
         </div>
     </div>
 
@@ -1032,7 +1035,7 @@
                 row.querySelector('[data-move="down"]').disabled = !row.nextElementSibling;
             }
             document.getElementById('btn-save-cat-order').disabled =
-                JSON.stringify(readCategoryOrder()) === JSON.stringify(categoryNames());
+                JSON.stringify(readCategoryOrder()) === JSON.stringify(categorySettings.ordem);
         }
 
         function categoryButton(icon, label, action, color = 'text-gray-300') {
@@ -1051,7 +1054,11 @@
             categorySortable?.destroy();
             list.replaceChildren();
 
-            for (const category of categoryNames()) {
+            const categories = categoryNames();
+            document.getElementById('category-count').textContent =
+                categories.length === 1 ? '1 categoria' : `${categories.length} categorias`;
+
+            for (const category of categories) {
                 const row = document.createElement('li');
                 row.className = 'flex items-center gap-1 sm:gap-3 p-1 sm:px-3 sm:py-2';
                 row.dataset.cat = category;
@@ -1111,13 +1118,15 @@
             if (savingCategories) return false;
             savingCategories = true;
             const controls = document.getElementById('category-controls');
-            controls.disabled = true;
+            controls.inert = true;
             categorySortable?.option('disabled', true);
             try {
                 const latest = await menu.config('categoria_ordem') ?? {};
-                const previous = latest.personalizadas ?? localCategoryList('boteco_bangu_custom_categories');
-                const custom = new Set(previous);
                 const excluded = new Set(latest.excluidas ?? []);
+                const custom = new Set([
+                    ...(latest.personalizadas ?? []),
+                    ...localCategoryList('boteco_bangu_custom_categories').filter(name => !excluded.has(name))
+                ]);
                 if (change.remove) {
                     custom.delete(change.remove);
                     excluded.add(change.remove);
@@ -1127,10 +1136,11 @@
                     excluded.delete(change.add);
                 }
                 const visible = new Set(categoryNames());
+                const assigned = new Set(allItems.map(item => item.categoria));
                 const concurrent = (latest.ordem ?? []).filter(name => !visible.has(name) && !excluded.has(name));
                 const settings = {
                     ...latest,
-                    ordem: [...new Set([...order, ...concurrent])],
+                    ordem: [...new Set([...order, ...concurrent])].filter(name => !excluded.has(name) || (name !== change.remove && assigned.has(name))),
                     personalizadas: [...custom],
                     excluidas: [...excluded]
                 };
@@ -1161,7 +1171,7 @@
                 return false;
             } finally {
                 savingCategories = false;
-                controls.disabled = false;
+                controls.inert = false;
                 categorySortable?.option('disabled', false);
             }
         }
