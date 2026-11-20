@@ -409,7 +409,33 @@
             "Chopps",
             "Carta de Vinhos"
         ];
-        let customCategories = JSON.parse(localStorage.getItem('boteco_bangu_custom_categories') || '[]');
+        let categorySettings = {};
+        let categorySortable;
+        let savingCategories = false;
+
+        function localCategoryList(key) {
+            try {
+                const value = JSON.parse(localStorage.getItem(key) || '[]');
+                return Array.isArray(value) ? value : [];
+            } catch {
+                return [];
+            }
+        }
+
+        function categoryNames() {
+            const assigned = allItems.map(item => item.categoria).filter(Boolean);
+            const custom = categorySettings.personalizadas ?? localCategoryList('boteco_bangu_custom_categories');
+            const excluded = new Set(categorySettings.excluidas ?? []);
+            const names = new Set([
+                ...[...DEFAULT_CATEGORIES, ...custom].filter(name => !excluded.has(name)),
+                ...assigned
+            ]);
+            const order = categorySettings.ordem ?? localCategoryList('boteco_bangu_cat_order');
+            return [...new Set([
+                ...order.filter(name => names.has(name)),
+                ...[...names].sort((a, b) => a.localeCompare(b, 'pt-BR'))
+            ])];
+        }
 
         let menu;
         let allItems = [];
@@ -453,13 +479,7 @@
             const prevFilterVal = filterSelect.value;
             const prevFormVal = formSelect.value;
 
-            const dbCategories = [...new Set(allItems.map(item => item.categoria))].filter(Boolean);
-            const allCategoriesSet = new Set([
-                ...DEFAULT_CATEGORIES,
-                ...dbCategories,
-                ...customCategories
-            ]);
-            const uniqueCategories = Array.from(allCategoriesSet).sort();
+            const uniqueCategories = categoryNames();
 
             filterSelect.innerHTML = '<option value="">Todas as Categorias</option>';
             uniqueCategories.forEach(cat => {
@@ -468,7 +488,7 @@
                 opt.textContent = cat;
                 filterSelect.appendChild(opt);
             });
-            filterSelect.value = prevFilterVal;
+            filterSelect.value = uniqueCategories.includes(prevFilterVal) ? prevFilterVal : '';
 
             formSelect.innerHTML = '<option value="">Selecione...</option>';
             uniqueCategories.forEach(cat => {
@@ -488,10 +508,7 @@
                     a.categoria.localeCompare(b.categoria) || (a.ordem ?? 0) - (b.ordem ?? 0));
                 const config = await menu.config('precos_festivos_ativos');
                 configPrecosFestivos = config?.valor_booleano === true;
-                const categoryConfig = await menu.config('categoria_ordem');
-                if (Array.isArray(categoryConfig?.ordem)) {
-                    localStorage.setItem('boteco_bangu_cat_order', JSON.stringify(categoryConfig.ordem));
-                }
+                categorySettings = await menu.config('categoria_ordem') ?? {};
             } catch (e) {
                 console.error("Erro ao puxar dados do Firebase:", e);
                 allItems = [];
@@ -951,43 +968,36 @@
         }
     </script>
     <!-- Modal Gerenciador de Categorias -->
-    <div id="categories-modal" class="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
-        <div class="bg-darkCard border border-gray-800 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300">
-            <!-- Header -->
-            <div class="px-6 py-4 border-b border-gray-800 flex justify-between items-center bg-darkBg">
-                <h3 class="font-montserrat font-bold text-sm text-white uppercase flex items-center gap-2">
-                    <i class="fas fa-tags text-wine-500"></i> Gerenciar Categorias
+    <div id="categories-modal" class="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-3 sm:p-6 hidden opacity-0 transition-opacity duration-300">
+        <div role="dialog" aria-modal="true" aria-labelledby="categories-title" class="bg-darkCard border border-gray-800 w-full max-w-4xl max-h-full flex flex-col rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300">
+            <div class="shrink-0 px-4 sm:px-6 py-4 border-b border-gray-800 flex justify-between items-center bg-darkBg">
+                <h3 id="categories-title" class="font-montserrat font-bold text-sm sm:text-base text-white uppercase flex items-center gap-2">
+                    <i class="fas fa-tags text-wine-500" aria-hidden="true"></i> Gerenciar categorias
                 </h3>
-                <button id="btn-close-categories-modal" class="text-gray-400 hover:text-white text-xl">
-                    <i class="fas fa-times"></i>
+                <button id="btn-close-categories-modal" type="button" aria-label="Fechar categorias" class="w-9 h-9 text-gray-400 hover:text-white text-xl">
+                    <i class="fas fa-times" aria-hidden="true"></i>
                 </button>
             </div>
-            
-            <!-- Body -->
-            <div class="p-6 space-y-4 bg-darkCard">
-                <!-- Add New Category Form -->
-                <div class="flex gap-2">
-                    <input type="text" id="new-category-input" placeholder="Nova categoria..." class="flex-1 px-3 py-2 rounded-lg bg-darkInput border border-gray-800 focus:outline-none focus:border-wine-700 text-gray-100 text-sm">
-                    <button id="btn-add-category" class="px-4 py-2 bg-wine-700 hover:bg-wine-800 text-white font-bold rounded-lg text-sm transition-colors flex items-center gap-1">
-                        <i class="fas fa-plus"></i> Add
+
+            <fieldset id="category-controls" class="min-w-0 min-h-0 flex flex-col gap-3 p-3 sm:p-6">
+                <div class="shrink-0 flex gap-2">
+                    <input type="text" id="new-category-input" aria-label="Nova categoria" placeholder="Nova categoria" class="min-w-0 flex-1 px-3 py-2 rounded-lg bg-darkInput border border-gray-800 focus:outline-none focus:border-wine-700 text-gray-100 text-sm">
+                    <button id="btn-add-category" type="button" class="px-3 sm:px-4 py-2 bg-wine-700 hover:bg-wine-800 text-white font-bold rounded-lg text-sm">
+                        Adicionar
                     </button>
-                </div>
-                
-                <!-- Category List -->
-                <div class="max-h-60 overflow-y-auto divide-y divide-gray-800/60 border border-gray-800 rounded-lg p-2 bg-darkBg">
-                    <ul id="categories-list-container" class="space-y-1">
-                        <!-- Categorias dinâmicas -->
-                    </ul>
                 </div>
 
-                <!-- Salvar Ordem -->
-                <div class="flex items-center justify-between pt-2 border-t border-gray-800/60">
-                    <p class="text-[11px] text-gray-500 flex items-center gap-1.5"><i class="fas fa-grip-lines text-gray-600"></i> Arraste as categorias para reordenar</p>
-                    <button id="btn-save-cat-order" onclick="saveCategoryOrder()" class="px-4 py-1.5 bg-wine-700 hover:bg-wine-800 text-white font-bold rounded-lg text-xs transition-colors flex items-center gap-1.5">
-                        <i class="fas fa-save"></i> Salvar Ordem
+                <div class="min-h-0 overflow-y-auto overscroll-contain border border-gray-800 rounded-lg bg-darkBg">
+                    <ul id="categories-list-container" class="divide-y divide-gray-800"></ul>
+                </div>
+
+                <div class="shrink-0 flex flex-wrap items-center justify-between gap-2">
+                    <p class="text-xs text-gray-400">Arraste pela alça ou use as setas.</p>
+                    <button id="btn-save-cat-order" type="button" onclick="saveCategoryOrder()" class="ml-auto px-4 py-2 bg-wine-700 hover:bg-wine-800 text-white font-bold rounded-lg text-sm disabled:opacity-50">
+                        Salvar ordem
                     </button>
                 </div>
-            </div>
+            </fieldset>
         </div>
     </div>
 
@@ -1007,190 +1017,193 @@
             modal.classList.add('opacity-0');
             modal.querySelector('div').classList.add('scale-95');
             setTimeout(() => {
-                modal.classList.add('hidden');
+                if (modal.classList.contains('opacity-0')) modal.classList.add('hidden');
             }, 300);
         }
 
+        function readCategoryOrder() {
+            return Array.from(document.querySelectorAll('#categories-list-container > li'), row => row.dataset.cat);
+        }
+
+        function updateCategoryArrows() {
+            const list = document.getElementById('categories-list-container');
+            for (const row of list.children) {
+                row.querySelector('[data-move="up"]').disabled = !row.previousElementSibling;
+                row.querySelector('[data-move="down"]').disabled = !row.nextElementSibling;
+            }
+            document.getElementById('btn-save-cat-order').disabled =
+                JSON.stringify(readCategoryOrder()) === JSON.stringify(categoryNames());
+        }
+
+        function categoryButton(icon, label, action, color = 'text-gray-300') {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = `w-9 h-9 sm:w-10 sm:h-10 rounded-md hover:bg-gray-800 disabled:opacity-35 ${color}`;
+            button.title = label;
+            button.setAttribute('aria-label', label);
+            button.innerHTML = `<i class="fas fa-${icon}" aria-hidden="true"></i>`;
+            button.onclick = action;
+            return button;
+        }
+
         function renderCategoriesList() {
-            const container = document.getElementById('categories-list-container');
-            if (!container) return;
+            const list = document.getElementById('categories-list-container');
+            categorySortable?.destroy();
+            list.replaceChildren();
 
-            const dbCategories = [...new Set(allItems.map(item => item.categoria))].filter(Boolean);
-            const allCategoriesSet = new Set([
-                ...DEFAULT_CATEGORIES,
-                ...dbCategories,
-                ...customCategories
-            ]);
+            for (const category of categoryNames()) {
+                const row = document.createElement('li');
+                row.className = 'flex items-center gap-1 sm:gap-3 p-1 sm:px-3 sm:py-2';
+                row.dataset.cat = category;
 
-            // Usa a ordem salva, adicionando no final as que ainda não estão nela
-            const savedOrder = (() => {
-                try { return JSON.parse(localStorage.getItem('boteco_bangu_cat_order') || '[]'); } catch { return []; }
-            })();
-            const uniqueCategories = [
-                ...savedOrder.filter(c => allCategoriesSet.has(c)),
-                ...[...allCategoriesSet].filter(c => !savedOrder.includes(c)).sort()
-            ];
+                const handle = document.createElement('span');
+                handle.className = 'cat-drag-handle flex w-7 sm:w-10 h-10 shrink-0 items-center justify-center cursor-grab select-none text-gray-400';
+                handle.setAttribute('aria-hidden', 'true');
+                handle.innerHTML = '<i class="fas fa-grip-vertical"></i>';
 
-            container.innerHTML = '';
-            uniqueCategories.forEach(cat => {
-                const li = document.createElement('li');
-                li.className = "flex items-center justify-between p-2 rounded-lg hover:bg-gray-800/40 transition-colors cursor-grab active:cursor-grabbing";
-                li.setAttribute('data-cat', cat);
+                const details = document.createElement('div');
+                details.className = 'min-w-0 flex-1';
+                const name = document.createElement('div');
+                name.className = 'text-sm sm:text-base font-semibold break-words';
+                name.textContent = category;
+                const count = allItems.filter(item => item.categoria === category).length;
+                const usage = document.createElement('div');
+                usage.className = 'text-xs text-gray-400';
+                usage.textContent = count === 0 ? 'Sem itens' : count === 1 ? '1 item' : `${count} itens`;
+                details.append(name, usage);
 
-                const leftDiv = document.createElement('div');
-                leftDiv.className = "flex items-center gap-2";
+                const up = categoryButton('arrow-up', `Subir ${category}`, () => moveCategory(row, 'up'));
+                up.dataset.move = 'up';
+                const down = categoryButton('arrow-down', `Descer ${category}`, () => moveCategory(row, 'down'));
+                down.dataset.move = 'down';
+                const edit = categoryButton('edit', `Renomear ${category}`, () => renameCategory(category), 'text-blue-400');
+                const remove = categoryButton('trash-alt', count ? `${category} tem itens vinculados` : `Excluir ${category}`, () => deleteCategory(category), 'text-red-400');
+                remove.disabled = count > 0;
+                const actions = document.createElement('div');
+                actions.className = 'flex shrink-0';
+                actions.append(up, down, edit, remove);
+                row.append(handle, details, actions);
+                list.append(row);
+            }
 
-                const handleIcon = document.createElement('i');
-                handleIcon.className = "fas fa-grip-lines text-gray-600 cat-drag-handle text-xs";
-                leftDiv.appendChild(handleIcon);
+            if (typeof Sortable !== 'undefined') {
+                categorySortable = Sortable.create(list, {
+                    handle: '.cat-drag-handle',
+                    animation: 150,
+                    onEnd: updateCategoryArrows
+                });
+            }
+            updateCategoryArrows();
+        }
 
-                const nameSpan = document.createElement('span');
-                nameSpan.className = "text-sm text-gray-200 font-medium flex items-center gap-2";
-                nameSpan.textContent = cat;
+        function moveCategory(row, direction) {
+            const neighbor = direction === 'up' ? row.previousElementSibling : row.nextElementSibling;
+            if (!neighbor) return;
+            if (direction === 'up') neighbor.before(row);
+            else neighbor.after(row);
+            updateCategoryArrows();
+            const button = row.querySelector(`[data-move="${direction}"]`);
+            (button.disabled ? row.querySelector('[data-move]:enabled') : button)?.focus({ preventScroll: true });
+            row.scrollIntoView({ block: 'nearest' });
+        }
 
-                const itemCount = allItems.filter(item => item.categoria === cat).length;
-                const countBadge = document.createElement('span');
-                countBadge.className = "text-xs px-2 py-0.5 rounded-full bg-gray-800 text-gray-400";
-                countBadge.textContent = `${itemCount} prato(s)`;
-                nameSpan.appendChild(countBadge);
-                leftDiv.appendChild(nameSpan);
-
-                const actionsDiv = document.createElement('div');
-                actionsDiv.className = "flex items-center gap-2";
-
-                const editBtn = document.createElement('button');
-                editBtn.className = "p-1 text-blue-400 hover:text-blue-300 transition-colors";
-                editBtn.title = "Renomear Categoria";
-                editBtn.innerHTML = '<i class="fas fa-edit"></i>';
-                editBtn.onclick = () => renameCategory(cat);
-
-                const deleteBtn = document.createElement('button');
-                deleteBtn.className = "p-1 text-red-500 hover:text-red-400 transition-colors";
-                deleteBtn.title = "Excluir Categoria";
-                deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
-                deleteBtn.onclick = () => deleteCategory(cat);
-
-                actionsDiv.appendChild(editBtn);
-                actionsDiv.appendChild(deleteBtn);
-
-                li.appendChild(leftDiv);
-                li.appendChild(actionsDiv);
-                container.appendChild(li);
-            });
-
-            // Ativa o Sortable na lista de categorias
-            if (window._catSortable) window._catSortable.destroy();
-            window._catSortable = Sortable.create(container, {
-                handle: '.cat-drag-handle',
-                animation: 150,
-                onEnd: () => {
-                    // Atualiza localStorage imediatamente ao arrastar
-                    const order = [...container.querySelectorAll('li[data-cat]')].map(li => li.getAttribute('data-cat'));
-                    localStorage.setItem('boteco_bangu_cat_order', JSON.stringify(order));
+        async function persistCategories(order, message, change = {}) {
+            if (savingCategories) return false;
+            savingCategories = true;
+            const controls = document.getElementById('category-controls');
+            controls.disabled = true;
+            categorySortable?.option('disabled', true);
+            try {
+                const latest = await menu.config('categoria_ordem') ?? {};
+                const previous = latest.personalizadas ?? localCategoryList('boteco_bangu_custom_categories');
+                const custom = new Set(previous);
+                const excluded = new Set(latest.excluidas ?? []);
+                if (change.remove) {
+                    custom.delete(change.remove);
+                    excluded.add(change.remove);
                 }
-            });
+                if (change.add) {
+                    custom.add(change.add);
+                    excluded.delete(change.add);
+                }
+                const visible = new Set(categoryNames());
+                const concurrent = (latest.ordem ?? []).filter(name => !visible.has(name) && !excluded.has(name));
+                const settings = {
+                    ...latest,
+                    ordem: [...new Set([...order, ...concurrent])],
+                    personalizadas: [...custom],
+                    excluidas: [...excluded]
+                };
+                if (change.remove) {
+                    const items = await menu.items();
+                    if (!change.add && items.some(item => item.categoria === change.remove)) {
+                        throw new Error('Esta categoria ainda tem itens vinculados.');
+                    }
+                    if (change.add) {
+                        const updates = items.filter(item => item.categoria === change.remove)
+                            .map(({ id }) => ({ id, categoria: change.add }));
+                        if (updates.length) await menu.updateItems(updates);
+                        allItems = items.map(item => item.categoria === change.remove
+                            ? { ...item, categoria: change.add }
+                            : item);
+                    }
+                }
+                await menu.setConfig('categoria_ordem', settings);
+                categorySettings = settings;
+                renderCategoriesList();
+                populateCategoryDropdowns();
+                updateDashboard();
+                renderTable();
+                showToast(message);
+                return true;
+            } catch (error) {
+                alert('Não foi possível salvar as categorias: ' + error.message);
+                return false;
+            } finally {
+                savingCategories = false;
+                controls.disabled = false;
+                categorySortable?.option('disabled', false);
+            }
+        }
+
+        function categoryExists(name, except) {
+            return categoryNames().some(category => category !== except &&
+                category.localeCompare(name, 'pt-BR', { sensitivity: 'accent' }) === 0);
         }
 
         async function addCategory() {
             const input = document.getElementById('new-category-input');
-            const catName = input.value.trim();
-            if (!catName) return;
-
-            const dbCategories = [...new Set(allItems.map(item => item.categoria))].filter(Boolean);
-            const allCategoriesSet = new Set([
-                ...DEFAULT_CATEGORIES,
-                ...dbCategories,
-                ...customCategories
-            ]);
-
-            if (allCategoriesSet.has(catName)) {
-                showToast("Esta categoria já existe!");
+            const name = input.value.trim();
+            if (!name) return;
+            if (categoryExists(name)) {
+                showToast('Esta categoria já existe.');
                 return;
             }
-
-            customCategories.push(catName);
-            localStorage.setItem('boteco_bangu_custom_categories', JSON.stringify(customCategories));
-            input.value = '';
-            
-            showToast("Categoria adicionada!");
-            renderCategoriesList();
-            populateCategoryDropdowns();
+            if (await persistCategories([...readCategoryOrder(), name], 'Categoria adicionada!', { add: name })) {
+                input.value = '';
+                input.focus();
+            }
         }
 
-        async function deleteCategory(catName) {
-            const itemsWithCat = allItems.filter(item => item.categoria === catName);
-            if (itemsWithCat.length > 0) {
-                alert(`Não é possível excluir a categoria "${catName}" porque ela possui ${itemsWithCat.length} pratos ativos. Primeiro altere a categoria desses pratos.`);
+        function deleteCategory(name) {
+            if (!confirm(`Excluir a categoria "${name}"?`)) return;
+            return persistCategories(readCategoryOrder().filter(category => category !== name),
+                'Categoria excluída!', { remove: name });
+        }
+
+        function renameCategory(name) {
+            const nextName = prompt('Novo nome da categoria', name)?.trim();
+            if (!nextName || nextName === name) return;
+            if (categoryExists(nextName, name)) {
+                showToast('Já existe uma categoria com esse nome.');
                 return;
             }
-
-            if (!confirm(`Deseja excluir a categoria "${catName}"?`)) return;
-
-            customCategories = customCategories.filter(cat => cat !== catName);
-            localStorage.setItem('boteco_bangu_custom_categories', JSON.stringify(customCategories));
-            
-            showToast("Categoria removida!");
-            renderCategoriesList();
-            populateCategoryDropdowns();
+            return persistCategories(readCategoryOrder().map(category => category === name ? nextName : category),
+                'Categoria renomeada!', { remove: name, add: nextName });
         }
 
-        async function renameCategory(catName) {
-            const novoNome = prompt(`Digite o novo nome para a categoria "${catName}":`, catName);
-            if (!novoNome || novoNome.trim() === "" || novoNome.trim() === catName) return;
-
-            const novoNomeTrim = novoNome.trim();
-
-            const dbCategories = [...new Set(allItems.map(item => item.categoria))].filter(Boolean);
-            const allCategoriesSet = new Set([
-                ...DEFAULT_CATEGORIES,
-                ...dbCategories,
-                ...customCategories
-            ]);
-
-            if (allCategoriesSet.has(novoNomeTrim) && novoNomeTrim.toLowerCase() !== catName.toLowerCase()) {
-                alert("Já existe uma categoria com este nome!");
-                return;
-            }
-
-            const itemsWithCat = allItems.filter(item => item.categoria === catName);
-            
-            if (itemsWithCat.length > 0) {
-                if (!confirm(`Deseja renomear a categoria de todos os ${itemsWithCat.length} prato(s) associados para "${novoNomeTrim}"?`)) return;
-
-                showToast("Renomeando no Firebase...");
-                try {
-                    await menu.updateItems(itemsWithCat.map(({ id }) => ({ id, categoria: novoNomeTrim })));
-                    showToast("Categoria renomeada no Firebase!");
-                } catch (e) {
-                    console.error("Erro ao renomear categoria:", e);
-                    alert("Erro ao salvar no Firebase: " + e.message);
-                    return;
-                }
-            }
-
-            if (customCategories.includes(catName)) {
-                customCategories = customCategories.map(cat => cat === catName ? novoNomeTrim : cat);
-                localStorage.setItem('boteco_bangu_custom_categories', JSON.stringify(customCategories));
-            } else if (DEFAULT_CATEGORIES.includes(catName)) {
-                customCategories.push(novoNomeTrim);
-                localStorage.setItem('boteco_bangu_custom_categories', JSON.stringify(customCategories));
-            }
-
-            await fetchData();
-            renderCategoriesList();
-        }
-
-        async function saveCategoryOrder() {
-            const container = document.getElementById('categories-list-container');
-            const order = [...container.querySelectorAll('li[data-cat]')].map(li => li.getAttribute('data-cat'));
-            
-            try {
-                await menu.setConfig('categoria_ordem', { ordem: order });
-                localStorage.setItem('boteco_bangu_cat_order', JSON.stringify(order));
-                showToast('Ordem das seções salva!');
-            } catch (error) {
-                alert('Não foi possível salvar a ordem: ' + error.message);
-            }
+        function saveCategoryOrder() {
+            return persistCategories(readCategoryOrder(), 'Ordem das categorias salva!');
         }
     </script>
 </body>
